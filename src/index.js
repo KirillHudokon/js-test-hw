@@ -1,28 +1,31 @@
 import './styles/index.css'  
 import Phaser from "phaser";
-import logoImg from "./assets/logo.png";
-
+import Customization from './customization/index.js'
 const config = {
   type: Phaser.AUTO,
   parent: "phaser-example",
-  width: '100%',
-  height: '100%',
-  scene: {
-    preload,
-    create,
-    update
-  }
+  width:'100%',
+  height:'100%',
+  dom: {
+    createContainer: true
+  },
+  scene: [Customization]
 };
 
 const game = new Phaser.Game(config);
 
-function preload() {
-  
+window.addEventListener('resize', () => {
+  game.scale.resize(window.innerWidth, window.innerHeight);
+}, false);
+
+/* function preload() {
+
+  this.load.image("background", logoImg);
 }
 
 function create() {
-
+  let image = this.add.image(window.innerWidth/2,  window.innerHeight/2, 'background');
 }
 
 function update() {
-}
+} */
