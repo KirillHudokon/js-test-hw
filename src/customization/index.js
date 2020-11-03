@@ -85,36 +85,52 @@ export default class Customization extends Phaser.Scene {
 
     }
     createHero(){
+        const localDate = JSON.parse(localStorage.getItem('hero_customization'))
+        
         const parent = this;
         this.setState({
-            default:{
+            currentStep: localDate?.currentStep||1
+        })
+        this.setState({
+            hero_structure:{
                 body:{
-                    type:'body_white', 
+                    type:localDate?.hero_structure?.body||'body_white', 
                     link(){ 
                         this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1);
-                        if(parent.state.default.emotion && parent.state.default.emotion.img){
+                        if(parent.state.hero_structure.emotion && parent.state.hero_structure.emotion.img){
                             if(this.type === 'body_white'){
-                                parent.state.default.emotion.type = 'face_f_1_surprised'     
+                                parent.state.hero_structure.emotion.type = 'face_f_1_surprised'     
                             }
                             if(this.type === 'body_latino'){
-                                parent.state.default.emotion.type = 'face_f_3_surprised'
+                                parent.state.hero_structure.emotion.type = 'face_f_3_surprised'
                             }
-                            parent.state.default.emotion.link()
+                            parent.state.hero_structure.emotion.link()
                         }
                     },  
                 }, 
-                cloths: {type:'cloths_f_regular_8', link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(2)}, },
-                emotion: {type:'face_f_1_surprised', link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(3)}, },
-                hair: {type:'hair_f_3', link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(4)},},
+                cloths: { 
+                    type: localDate?.hero_structure?.cloths||'cloths_f_regular_8', 
+                    link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(2)}, 
+                },
+                emotion: {
+                    type:localDate?.hero_structure?.emotion||'face_f_1_surprised',
+                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(3)}, 
+                },
+                hair: { 
+                    type:localDate?.hero_structure?.hair||'hair_f_3', 
+                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(4)},
+                },
             } 
         });
-        Object.values(this.state.default).forEach((img)=> img.link())
+        Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
     itemChoosen(){
-        const choosen = document.createElement('div');
-        choosen.innerHTML = 'Item choosen'.toUpperCase();
-        choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
-        this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
+        if(this.state.currentStep === 4){
+            const choosen = document.createElement('div');
+            choosen.innerHTML = 'Item choosen'.toUpperCase();
+            choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
+            this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
+        }
     }
     createChooseContainer(){
         const chooseContainer = document.createElement('div');
@@ -122,7 +138,7 @@ export default class Customization extends Phaser.Scene {
         this.containerText = document.createElement('div');
         chooseContainer.style = "postition: relative; background: rgba(255, 255, 255, 0.8); width: 288px; height:88px; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 12px; font-size: 20px; text-align: center; color: #141A3D; overflow:hidden; font-weight:400; font-weight:normal; font-family: Nunito Sans Bold"
         this.options.style = "width: 120px;height: 25px; margin:0px auto 22px; margin-bottom:20px; background: linear-gradient(180deg, #F48BB8 0%, #ED5C9A 100%);border: 1px solid #FBD4E5;box-sizing: border-box;box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15), inset 1px -2px 2px rgba(232, 131, 173, 0.25); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:10px; display:flex; align-items: center; justify-content:center; color:white "
-        this.options.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep]].length}`
+        this.options.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep-1]].length}`
         this.containerText.innerHTML = 'Choose your hair'
         chooseContainer.append(this.options,this.containerText)
         this.add.dom(window.innerWidth/2, window.innerHeight-148, chooseContainer);
@@ -144,7 +160,19 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentOption:1
             })
+            console.log(this.state.hero_structure)
+            let hero_customization = {
+                currentStep: this.state.currentStep,
+                hero_structure:{
+                    hair:this.state.hero_structure.hair.type,
+                    body:this.state.hero_structure.body.type,
+                    emotion:this.state.hero_structure.emotion.type,
+                    cloths:this.state.hero_structure.cloths.type,
+                }
+            }
+            localStorage.setItem('hero_customization',JSON.stringify(hero_customization))
             this.createOptions()
+            this.createArrows()
         }
         this.add.dom(window.innerWidth/2, window.innerHeight-69, confirmButton);
     }
@@ -154,30 +182,32 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentOption:this.state.currentOption-1
             })
-            
+            this.createArrows()
         }
         if(where === 'right'){
             this.setState({
                 currentOption:this.state.currentOption+1
             }) 
-           
+           this.createArrows()
         }
         this.createOptions()
     }
     changeHeroStructure(){
         const parent = this
         const currentStepName = this.state.steps[this.state.currentStep-1]
-        this.state.default[currentStepName].img.destroy() 
+        this.state.hero_structure[currentStepName].img.destroy() 
         this.setState({
-             default:{
-                 ...parent.state.default,
-                [currentStepName]: {...this.state.default[currentStepName],type: this.state[currentStepName][this.state.currentOption-1]},
+            hero_structure:{
+                 ...parent.state.hero_structure,
+                [currentStepName]: {...this.state.hero_structure[currentStepName],type: this.state[currentStepName][this.state.currentOption-1]},
              } 
          })
-         this.state.default[currentStepName].link()
+         this.state.hero_structure[currentStepName].link()
     }
     createArrows(){
         const parent = this;
+        if(this.left) this.left.destroy()
+        if(this.right) this.right.destroy()
         this.home = this.add.sprite(window.innerWidth/2+130, window.innerHeight-67, 'view').setInteractive();
         this.home.on('pointerdown', ()=>console.log(1)); 
         this.left = this.add.sprite(window.innerWidth/2-130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7);
@@ -185,6 +215,8 @@ export default class Customization extends Phaser.Scene {
         this.right = this.add.sprite(window.innerWidth/2+130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7)
         this.right.angle = 180
         this.right.on('pointerdown', ()=>this.changeCurrentOption('right')); 
+        if(this.state.currentOption === 1) this.left.destroy()
+        if(this.state.currentOption === this.state[this.state.steps[this.state.currentStep-1]].length) this.right.destroy()
     }
     createOptions(){
         const parent = this
@@ -193,25 +225,29 @@ export default class Customization extends Phaser.Scene {
         let margin = -((15 * this.state[this.state.steps[this.state.currentStep-1]].length)/2)/2
        
         for(let i=0; i < this.state[this.state.steps[this.state.currentStep-1]].length; i++){
-            console.log(this.state[this.state.steps[this.state.currentStep-1]].length)
             if(i === this.state.currentOption-1){
                 this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-203, 'active').setInteractive().setDepth(8).on('pointerdown', ()=>{
                     this.setState({
                         currentOption:i+1
                     }) 
                     this.createOptions()
+                    this.createArrows()
                  }))
             }else{
-                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-203, 'inactive').setInteractive().setDepth(8).on('pointerdown', ()=>{
+                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-204, 'inactive').setInteractive().setDepth(8).on('pointerdown', ()=>{
                     this.setState({
                         currentOption:i+1
                     })
                     this.createOptions() 
+                    this.createArrows()
                  }))
             }
             margin+=15
         }
     
+    }
+    itemChosenView(){
+       
     }
     create(){
         this.createHero();
@@ -230,8 +266,10 @@ export default class Customization extends Phaser.Scene {
     update(){
         //console.log(this.state)
         //this.createOptions()
+        this.itemChoosen()
         this.changeHeroStructure()
         this.containerText.innerHTML = `Choose your ${this.state.steps[this.state.currentStep-1]}`
         this.options.innerHTML = `Choose option ${this.state.currentOption}/${this.state[this.state.steps[this.state.currentStep-1]].length}`
+        this.itemChosenView()
     }
 } 
