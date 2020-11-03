@@ -5,28 +5,25 @@ export default class Customization extends Phaser.Scene {
         super('Customization')
         this.state = {
             steps:['body', 'hair', 'cloths'],
-            currentStep:1
+            currentStep:1,
+            currentOption:1
         }
         this.setState = this.setState.bind(this)
         this.options;
         this.containerText;
+        this.itemOptions=[]
     }
     setState(newState){
         this.state = {...this.state,...newState}
     }
     getBody(id,type){
         const emotions = ['angry', 'default', 'joy', 'sad', 'shy', 'surprised'];
-        const parent = this
         try{
             const name = `body_${type}`
             const path = require(`../assets/MAINHERO/start/body/${id}/face_f_${id}_body_f_regular_${type}_${id}.png`).default
             this.load.image(name, path);
             this.setState({
-                body:this.state.body ? [...this.state.body,{
-                    type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}
-                }] : [{
-                    type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}
-                }]
+                body:this.state.body ? [...this.state.body, name]:[name]
             })
         }catch(e){
             console.error(e.message)
@@ -37,9 +34,7 @@ export default class Customization extends Phaser.Scene {
             const path = require(`../assets/MAINHERO/start/body/${id}/emotions/face_f_${id}_${emotion}.png`).default
             this.load.image(name, path);
             this.setState({
-                emotions:this.state.emotions ? 
-                [...this.state.emotions,{type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}] :
-                [{type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}]
+                emotions:this.state.emotions ?  [...this.state.emotions,emotion] : [emotion]
             })
             }catch(e){
                console.error(e.message)     
@@ -53,11 +48,8 @@ export default class Customization extends Phaser.Scene {
             this.load.image('cloths_f_regular_9', require('../assets/MAINHERO/start/clothes/cloths_f_regular_9.png').default);
             this.load.image('cloths_f_regular_16', require('../assets/MAINHERO/start/clothes/cloths_f_regular_16.png').default);
             this.setState({
-                cloths:[ 
-                    {type:'cloths_f_regular_8', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
-                    {type:'cloths_f_regular_9', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
-                    {type:'cloths_f_regular_16', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}
-                ]})
+                cloths:['cloths_f_regular_8', 'cloths_f_regular_9', 'cloths_f_regular_16']
+            })
         }catch(e){
             console.error(e.message)    
         }
@@ -70,10 +62,7 @@ export default class Customization extends Phaser.Scene {
             this.load.image('hair_f_3', require('../assets/MAINHERO/start/hair/front/hair_f_3.png').default);
             this.load.image('hair_f_4', require('../assets/MAINHERO/start/hair/front/hair_f_4.png').default);
             this.setState({
-                hair:[
-                    {type:'hair_f_3', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
-                    {type:'hair_f_4', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}
-                ]
+                hair:['hair_f_3', 'hair_f_4', ]
             })
         }catch(e){
             console.error(e.message)    
@@ -92,70 +81,145 @@ export default class Customization extends Phaser.Scene {
         this.getClothes()
         this.getHair()
         this.getAssets()
+        //this.add.image(window.innerWidth/2, window.innerHeight-249,'body_white').setScale(0.3)
+
+    }
+    createHero(){
+        const parent = this;
         this.setState({
             default:{
-                body:{type:'body_white', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}, 
-                cloths: {type:'cloths_f_regular_8', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
-                emotion: {type:'face_f_1_surprised', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
-                hair: {type:'hair_f_4', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
+                body:{
+                    type:'body_white', 
+                    link(){ 
+                        this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1);
+                        if(parent.state.default.emotion && parent.state.default.emotion.img){
+                            if(this.type === 'body_white'){
+                                parent.state.default.emotion.type = 'face_f_1_surprised'     
+                            }
+                            if(this.type === 'body_latino'){
+                                parent.state.default.emotion.type = 'face_f_3_surprised'
+                            }
+                            parent.state.default.emotion.link()
+                        }
+                    },  
+                }, 
+                cloths: {type:'cloths_f_regular_8', link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(2)}, },
+                emotion: {type:'face_f_1_surprised', link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(3)}, },
+                hair: {type:'hair_f_3', link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(4)},},
             } 
-        })
+        });
+        Object.values(this.state.default).forEach((img)=> img.link())
     }
-    create(){
-        const formStyles = {
-            background: "rgba(255, 255, 255, 0.8)",
-            width: "288px",
-            height: "88px",
-            'box-shadow': "0px 3px 4px rgba(0, 0, 0, 0.24)",
-            'border-radius': '12px',
-            'font-size': '20px',
-            'text-align': 'center',
-            'color': '#141A3D'    
-        }
-        const parent = this
-        const stepsContainer = document.createElement('div')
-        stepsContainer.style = 'width: 252px; display:flex; align-items:center; justify-content:center'
-
-        const container = document.createElement('div');
-        this.options = document.createElement('div');
-        this.containerText = document.createElement('div');
-        const confirmButton = document.createElement('div');
+    itemChoosen(){
         const choosen = document.createElement('div');
         choosen.innerHTML = 'Item choosen'.toUpperCase();
         choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
-        confirmButton.style = 'position: absolute; width:216px; height:42px; background: linear-gradient(180deg, #DB5186 0%, #C6236A 100%); border: 2px solid #D34E7E;box-sizing: border-box;box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 30px; line-height:34.5px; font-family: Nunito Sans Bold; color:white; font-size:15px; text-align:center'
-        confirmButton.innerHTML = 'Confirm'
-        container.style = "postition: relative; background: rgba(255, 255, 255, 0.8); width: 288px; height:88px; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 12px; font-size: 20px; text-align: center; color: #141A3D; overflow:hidden; font-weight:400; font-weight:normal; font-family: Nunito Sans Bold"
+        this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
+    }
+    createChooseContainer(){
+        const chooseContainer = document.createElement('div');
+        this.options = document.createElement('div');
+        this.containerText = document.createElement('div');
+        chooseContainer.style = "postition: relative; background: rgba(255, 255, 255, 0.8); width: 288px; height:88px; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 12px; font-size: 20px; text-align: center; color: #141A3D; overflow:hidden; font-weight:400; font-weight:normal; font-family: Nunito Sans Bold"
         this.options.style = "width: 120px;height: 25px; margin:0px auto 22px; margin-bottom:20px; background: linear-gradient(180deg, #F48BB8 0%, #ED5C9A 100%);border: 1px solid #FBD4E5;box-sizing: border-box;box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15), inset 1px -2px 2px rgba(232, 131, 173, 0.25); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:10px; display:flex; align-items: center; justify-content:center; color:white "
         this.options.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep]].length}`
-        confirmButton.onclick= function(){
-            console.log(1)
-           parent.state.default.hair.link.destoy();
-           parent.state.default.hair.type = 'hair_f_3'
-           //hair: {type:'hair_f_3', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
-        }
         this.containerText.innerHTML = 'Choose your hair'
-        container.append(this.options,this.containerText)
-        Object.values(this.state.default).forEach((img)=> img.link().setScale(0.3))
-        //this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
+        chooseContainer.append(this.options,this.containerText)
+        this.add.dom(window.innerWidth/2, window.innerHeight-148, chooseContainer);
+    }
+    createOptionsContainer(){
+        const optionsContainer = document.createElement('div'); 
+        optionsContainer.style = 'width: 252px; display:flex; align-items:center; justify-content:center'
+        this.add.dom(window.innerWidth/2, window.innerHeight-204, optionsContainer);
+    }
+    createConfirmButton(){
+        const parent=this;
+        const confirmButton = document.createElement('div');
+        confirmButton.style = 'position: absolute; width:216px; height:42px; background: linear-gradient(180deg, #DB5186 0%, #C6236A 100%); border: 2px solid #D34E7E;box-sizing: border-box;box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 30px; line-height:34.5px; font-family: Nunito Sans Bold; color:white; font-size:15px; text-align:center'
+        confirmButton.innerHTML = 'Confirm'
+        confirmButton.onclick=()=>{ 
+            this.setState({
+                currentStep: parent.state.currentStep+1
+            })
+            this.setState({
+                currentOption:1
+            })
+        }
         this.add.dom(window.innerWidth/2, window.innerHeight-69, confirmButton);
-        this.add.dom(window.innerWidth/2, window.innerHeight-148, container);
+    }
+    changeCurrentOption(where){
+
+        if(where === 'left'){
+            this.setState({
+                currentOption:this.state.currentOption-1
+            })
+            
+        }
+        if(where === 'right'){
+            this.setState({
+                currentOption:this.state.currentOption+1
+            }) 
+           
+        }
+    }
+    changeHeroStructure(){
+        const parent = this
+        const currentStepName = this.state.steps[this.state.currentStep-1]
+        this.state.default[currentStepName].img.destroy() 
+        this.setState({
+             default:{
+                 ...parent.state.default,
+                [currentStepName]: {...this.state.default[currentStepName],type: this.state[currentStepName][this.state.currentOption-1]},
+             } 
+         })
+         this.state.default[currentStepName].link()
+    }
+    createArrows(){
+        const parent = this;
         this.home = this.add.sprite(window.innerWidth/2+130, window.innerHeight-67, 'view').setInteractive();
         this.home.on('pointerdown', ()=>console.log(1)); 
         this.left = this.add.sprite(window.innerWidth/2-130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7);
-        this.left.on('pointerdown', ()=>console.log('left')); 
+        this.left.on('pointerdown', ()=>this.changeCurrentOption('left')); 
         this.right = this.add.sprite(window.innerWidth/2+130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7)
         this.right.angle = 180
-        this.right.on('pointerdown', ()=>parent.state.default.hair.type = 'hair_f_4'); 
-       // this.active = this.add.sprite(window.innerWidth/2, window.innerHeight-203, 'active').setInteractive()
-        //this.inActive = this.add.sprite(window.innerWidth/2-15, window.innerHeight-204, 'inactive').setInteractive()
-        this.add.dom(window.innerWidth/2, window.innerHeight-204, stepsContainer);
-        console.log(this.state)
+        this.right.on('pointerdown', ()=>this.changeCurrentOption('right')); 
+    }
+    createOptions(){
+        const parent = this
+        this.itemOptions.forEach(item=>item.destroy())
+        let margin = -((15 * this.state[this.state.steps[this.state.currentStep-1]].length)/2)/2
+        for(let i=0; i < this.state[this.state.steps[this.state.currentStep-1]].length; i++){
+            console.log(margin)
+            if(i === this.state.currentStep-1){
+                console.log(i,this.options)
+               
+               this.itemOptions.push(this.add.sprite(window.innerWidth/2-(-margin), window.innerHeight-203, 'active').setInteractive().setDepth(8))
+            }else{
+                console.log(i)
+               this.itemOptions.push(this.add.sprite(window.innerWidth/2-(-margin), window.innerHeight-204, 'inactive').setInteractive().setDepth(8))
+            }
+            margin+=15
+        }
+    }
+    create(){
+        this.createHero();
+        this.itemChoosen();
+        this.createChooseContainer();
+        this.createOptionsContainer();
+        this.createConfirmButton();
+        this.createArrows()
+    
+        //this.arr = [this.add.sprite(window.innerWidth/2-15, window.innerHeight-203, 'active').setInteractive().setDepth(8),this.add.sprite(window.innerWidth/2-7, window.innerHeight-203, 'active').setInteractive().setDepth(8)]
+        
+        //this.inActive = this.add.sprite(window.innerWidth/2, window.innerHeight-204, 'inactive').setInteractive().setDepth(8)
+        
+    
     }
     update(){
-        console.log(this.state.default.hair)
+        //console.log(this.state)
+        this.createOptions()
+        this.changeHeroStructure()
         this.containerText.innerHTML = `Choose your ${this.state.steps[this.state.currentStep-1]}`
-        this.options.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep-1]].length}`
-        Object.values(this.state.default).forEach((img)=> img.link().setScale(0.3))
+        this.options.innerHTML = `Choose option ${this.state.currentOption}/${this.state[this.state.steps[this.state.currentStep-1]].length}`
     }
 } 
