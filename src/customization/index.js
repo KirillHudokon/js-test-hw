@@ -16,12 +16,17 @@ export default class Customization extends Phaser.Scene {
     }
     getBody(id,type){
         const emotions = ['angry', 'default', 'joy', 'sad', 'shy', 'surprised'];
+        const parent = this
         try{
             const name = `body_${type}`
             const path = require(`../assets/MAINHERO/start/body/${id}/face_f_${id}_body_f_regular_${type}_${id}.png`).default
             this.load.image(name, path);
             this.setState({
-                body:this.state.body ? [...this.state.body,{type:name, link:type}] : [{type:name, link:type}]
+                body:this.state.body ? [...this.state.body,{
+                    type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}
+                }] : [{
+                    type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}
+                }]
             })
         }catch(e){
             console.error(e.message)
@@ -31,30 +36,34 @@ export default class Customization extends Phaser.Scene {
             const name = `face_f_${id}_${emotion}`
             const path = require(`../assets/MAINHERO/start/body/${id}/emotions/face_f_${id}_${emotion}.png`).default
             this.load.image(name, path);
-            ///this.setState({
-                //emotions:this.state.body ? [...this.state.body,{type:name, link:type}] : [{type:name, link:type}]
-            //})
+            this.setState({
+                emotions:this.state.emotions ? 
+                [...this.state.emotions,{type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}] :
+                [{type:name, link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}]
+            })
             }catch(e){
                console.error(e.message)     
             }
         })
     }
     getClothes(){
+        const parent = this
         try{
             this.load.image('cloths_f_regular_8', require('../assets/MAINHERO/start/clothes/cloths_f_regular_8.png').default);
             this.load.image('cloths_f_regular_9', require('../assets/MAINHERO/start/clothes/cloths_f_regular_9.png').default);
             this.load.image('cloths_f_regular_16', require('../assets/MAINHERO/start/clothes/cloths_f_regular_16.png').default);
             this.setState({
                 cloths:[ 
-                    {type:'cloths_f_regular_8', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)},
-                    {type:'cloths_f_regular_9', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)},
-                    {type:'cloths_f_regular_16', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)}
+                    {type:'cloths_f_regular_8', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
+                    {type:'cloths_f_regular_9', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
+                    {type:'cloths_f_regular_16', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}
                 ]})
         }catch(e){
             console.error(e.message)    
         }
     }
     getHair(){
+        const parent = this
         try{
             this.load.image('hair_f_3_back', require('../assets/MAINHERO/start/hair/back/hair_f_3_back.png').default);
             this.load.image('hair_f_4_back', require('../assets/MAINHERO/start/hair/back/hair_f_4_back.png').default);
@@ -62,8 +71,8 @@ export default class Customization extends Phaser.Scene {
             this.load.image('hair_f_4', require('../assets/MAINHERO/start/hair/front/hair_f_4.png').default);
             this.setState({
                 hair:[
-                    {type:'hair_f_3', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)},
-                    {type:'hair_f_4', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)}
+                    {type:'hair_f_3', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
+                    {type:'hair_f_4', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}
                 ]
             })
         }catch(e){
@@ -77,6 +86,7 @@ export default class Customization extends Phaser.Scene {
         this.load.image('active', require('../assets/active.png').default);
     }
     preload(){
+        const parent = this
         this.getBody(1,'white')
         this.getBody(3,'latino')
         this.getClothes()
@@ -84,10 +94,10 @@ export default class Customization extends Phaser.Scene {
         this.getAssets()
         this.setState({
             default:{
-                body:{type:'body_white', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)}, 
-                cloths: {type:'cloths_f_regular_8', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)},
-                emotion: 'face_f_1_surprised',
-                hair: {type:'hair_f_3', link: this.add.image(window.innerWidth/2, window.innerHeight-249,type)},
+                body:{type:'body_white', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}}, 
+                cloths: {type:'cloths_f_regular_8', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
+                emotion: {type:'face_f_1_surprised', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
+                hair: {type:'hair_f_4', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
             } 
         })
     }
@@ -102,7 +112,7 @@ export default class Customization extends Phaser.Scene {
             'text-align': 'center',
             'color': '#141A3D'    
         }
-        var self = this
+        const parent = this
         const stepsContainer = document.createElement('div')
         stepsContainer.style = 'width: 252px; display:flex; align-items:center; justify-content:center'
 
@@ -119,11 +129,14 @@ export default class Customization extends Phaser.Scene {
         this.options.style = "width: 120px;height: 25px; margin:0px auto 22px; margin-bottom:20px; background: linear-gradient(180deg, #F48BB8 0%, #ED5C9A 100%);border: 1px solid #FBD4E5;box-sizing: border-box;box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15), inset 1px -2px 2px rgba(232, 131, 173, 0.25); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:10px; display:flex; align-items: center; justify-content:center; color:white "
         this.options.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep]].length}`
         confirmButton.onclick= function(){
-            self.state.default.hair.des
+            console.log(1)
+           parent.state.default.hair.link.destoy();
+           parent.state.default.hair.type = 'hair_f_3'
+           //hair: {type:'hair_f_3', link:function(){ return parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type)}},
         }
         this.containerText.innerHTML = 'Choose your hair'
         container.append(this.options,this.containerText)
-    
+        Object.values(this.state.default).forEach((img)=> img.link().setScale(0.3))
         //this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
         this.add.dom(window.innerWidth/2, window.innerHeight-69, confirmButton);
         this.add.dom(window.innerWidth/2, window.innerHeight-148, container);
@@ -133,15 +146,16 @@ export default class Customization extends Phaser.Scene {
         this.left.on('pointerdown', ()=>console.log('left')); 
         this.right = this.add.sprite(window.innerWidth/2+130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7)
         this.right.angle = 180
-        this.right.on('pointerdown', ()=>console.log('right')); 
+        this.right.on('pointerdown', ()=>parent.state.default.hair.type = 'hair_f_4'); 
        // this.active = this.add.sprite(window.innerWidth/2, window.innerHeight-203, 'active').setInteractive()
         //this.inActive = this.add.sprite(window.innerWidth/2-15, window.innerHeight-204, 'inactive').setInteractive()
         this.add.dom(window.innerWidth/2, window.innerHeight-204, stepsContainer);
+        console.log(this.state)
     }
     update(){
+        console.log(this.state.default.hair)
         this.containerText.innerHTML = `Choose your ${this.state.steps[this.state.currentStep-1]}`
         this.options.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep-1]].length}`
-       // console.log(this.state.default)
-        //Object.values(this.state.default).forEach((value)=> this.add.image(window.innerWidth/2, window.innerHeight-249,value).setScale(0.3))
+        Object.values(this.state.default).forEach((img)=> img.link().setScale(0.3))
     }
 } 
