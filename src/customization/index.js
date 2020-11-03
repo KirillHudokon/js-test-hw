@@ -144,6 +144,7 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentOption:1
             })
+            this.createOptions()
         }
         this.add.dom(window.innerWidth/2, window.innerHeight-69, confirmButton);
     }
@@ -161,6 +162,7 @@ export default class Customization extends Phaser.Scene {
             }) 
            
         }
+        this.createOptions()
     }
     changeHeroStructure(){
         const parent = this
@@ -187,19 +189,29 @@ export default class Customization extends Phaser.Scene {
     createOptions(){
         const parent = this
         this.itemOptions.forEach(item=>item.destroy())
+        this.itemOptions=[]
         let margin = -((15 * this.state[this.state.steps[this.state.currentStep-1]].length)/2)/2
+       
         for(let i=0; i < this.state[this.state.steps[this.state.currentStep-1]].length; i++){
-            console.log(margin)
-            if(i === this.state.currentStep-1){
-                console.log(i,this.options)
-               
-               this.itemOptions.push(this.add.sprite(window.innerWidth/2-(-margin), window.innerHeight-203, 'active').setInteractive().setDepth(8))
+            console.log(this.state[this.state.steps[this.state.currentStep-1]].length)
+            if(i === this.state.currentOption-1){
+                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-203, 'active').setInteractive().setDepth(8).on('pointerdown', ()=>{
+                    this.setState({
+                        currentOption:i+1
+                    }) 
+                    this.createOptions()
+                 }))
             }else{
-                console.log(i)
-               this.itemOptions.push(this.add.sprite(window.innerWidth/2-(-margin), window.innerHeight-204, 'inactive').setInteractive().setDepth(8))
+                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-203, 'inactive').setInteractive().setDepth(8).on('pointerdown', ()=>{
+                    this.setState({
+                        currentOption:i+1
+                    })
+                    this.createOptions() 
+                 }))
             }
             margin+=15
         }
+    
     }
     create(){
         this.createHero();
@@ -208,16 +220,16 @@ export default class Customization extends Phaser.Scene {
         this.createOptionsContainer();
         this.createConfirmButton();
         this.createArrows()
-    
+        this.createOptions()
         //this.arr = [this.add.sprite(window.innerWidth/2-15, window.innerHeight-203, 'active').setInteractive().setDepth(8),this.add.sprite(window.innerWidth/2-7, window.innerHeight-203, 'active').setInteractive().setDepth(8)]
-        
-        //this.inActive = this.add.sprite(window.innerWidth/2, window.innerHeight-204, 'inactive').setInteractive().setDepth(8)
+    
+       // this.inActive = this.add.sprite(window.innerWidth/2, window.innerHeight-204, 'inactive').setInteractive().setDepth(8)
         
     
     }
     update(){
         //console.log(this.state)
-        this.createOptions()
+        //this.createOptions()
         this.changeHeroStructure()
         this.containerText.innerHTML = `Choose your ${this.state.steps[this.state.currentStep-1]}`
         this.options.innerHTML = `Choose option ${this.state.currentOption}/${this.state[this.state.steps[this.state.currentStep-1]].length}`
