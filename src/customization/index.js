@@ -92,6 +92,7 @@ export default class Customization extends Phaser.Scene {
                     link(){ 
                         this.img = parent.add.sprite(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1)
                         if(parent.state.hero_structure.emotion && parent.state.hero_structure.emotion.img){
+                            parent.state.hero_structure.emotion.img.destroy()
                             if(this.type === 'body_white'){
                                 parent.state.hero_structure.emotion.type = 'face_f_1_default'     
                             }
@@ -120,10 +121,26 @@ export default class Customization extends Phaser.Scene {
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
     itemChoosen(){
-        const parent = this
+        this.scene.start('Dialog')
+        const parent = this;
         //setTimeout(()=>{
-            parent.scene.start('Dialog')
-        //},2000)
+        //    parent.scene.start('Dialog')
+        //},2100)
+        const fadeDelay={
+            body:1,
+            face:0.1,
+            cloths: 1.5,
+            hair:2
+        }
+        Object.values(parent.state.hero_structure).forEach((structureItem,i)=>{
+        const findedStructureItem = Object.entries(fadeDelay).find(delayItem => structureItem.type.indexOf(delayItem[0])!==-1)
+            parent.tweens.add({
+                targets: structureItem.img,
+                alpha: 0,
+                duration: findedStructureItem[1]*1000,
+                ease: 'Power2'
+            }, parent);
+        })
         const choosen = document.createElement('div');
         choosen.innerHTML = 'Item choosen'.toUpperCase();
         choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
