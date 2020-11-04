@@ -42,7 +42,6 @@ export default class Customization extends Phaser.Scene {
         })
     }
     getClothes(){
-        const parent = this
         try{
             this.load.image('cloths_f_regular_8', require('../assets/MAINHERO/start/clothes/cloths_f_regular_8.png').default);
             this.load.image('cloths_f_regular_9', require('../assets/MAINHERO/start/clothes/cloths_f_regular_9.png').default);
@@ -55,7 +54,6 @@ export default class Customization extends Phaser.Scene {
         }
     }
     getHair(){
-        const parent = this
         try{
             this.load.image('hair_f_3_back', require('../assets/MAINHERO/start/hair/back/hair_f_3_back.png').default);
             this.load.image('hair_f_4_back', require('../assets/MAINHERO/start/hair/back/hair_f_4_back.png').default);
@@ -75,19 +73,15 @@ export default class Customization extends Phaser.Scene {
         this.load.image('active', require('../assets/active.png').default);
     }
     preload(){
-        const parent = this
         this.getBody(1,'white')
         this.getBody(3,'latino')
         this.getClothes()
         this.getHair()
         this.getAssets()
-        //this.add.image(window.innerWidth/2, window.innerHeight-249,'body_white').setScale(0.3)
-
     }
     createHero(){
-        const localDate = JSON.parse(localStorage.getItem('hero_customization'))
-        
         const parent = this;
+        const localDate = JSON.parse(localStorage.getItem('hero_customization'))       
         this.setState({
             currentStep: localDate?.currentStep||1
         })
@@ -96,16 +90,17 @@ export default class Customization extends Phaser.Scene {
                 body:{
                     type:localDate?.hero_structure?.body||'body_white', 
                     link(){ 
-                        this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1);
+                        this.img = parent.add.sprite(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1)
                         if(parent.state.hero_structure.emotion && parent.state.hero_structure.emotion.img){
                             if(this.type === 'body_white'){
-                                parent.state.hero_structure.emotion.type = 'face_f_1_surprised'     
+                                parent.state.hero_structure.emotion.type = 'face_f_1_default'     
                             }
                             if(this.type === 'body_latino'){
-                                parent.state.hero_structure.emotion.type = 'face_f_3_surprised'
+                                parent.state.hero_structure.emotion.type = 'face_f_3_default'
                             }
                             parent.state.hero_structure.emotion.link()
                         }
+
                     },  
                 }, 
                 cloths: { 
@@ -113,7 +108,7 @@ export default class Customization extends Phaser.Scene {
                     link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(2)}, 
                 },
                 emotion: {
-                    type:localDate?.hero_structure?.emotion||'face_f_1_surprised',
+                    type:localDate?.hero_structure?.emotion||'face_f_1_default',
                     link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(3)}, 
                 },
                 hair: { 
@@ -234,7 +229,6 @@ export default class Customization extends Phaser.Scene {
                 }
             }
             localStorage.setItem('hero_customization',JSON.stringify(hero_customization))
-            
             this.confirmButton.remove()
             this.chooseContainer.remove()
             this.itemChoosen()
