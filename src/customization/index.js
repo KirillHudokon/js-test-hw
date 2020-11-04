@@ -120,18 +120,21 @@ export default class Customization extends Phaser.Scene {
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
     itemChoosen(){
-            const choosen = document.createElement('div');
-            choosen.innerHTML = 'Item choosen'.toUpperCase();
-            choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
-            this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
-            if(this.itemOptions.length){
-                this.itemOptions.forEach(item=>item.destroy())
-                this.itemOptions=[]
-            }
-            if(this.left) this.left.destroy()
-            if(this.right) this.right.destroy()
-            if(this.home) this.home.destroy()
-        
+        const parent = this
+        //setTimeout(()=>{
+            parent.scene.start('Dialog')
+        //},2000)
+        const choosen = document.createElement('div');
+        choosen.innerHTML = 'Item choosen'.toUpperCase();
+        choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
+        this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
+        if(this.itemOptions.length){
+            this.itemOptions.forEach(item=>item.destroy())
+            this.itemOptions=[]
+        }
+        if(this.left) this.left.destroy()
+        if(this.right) this.right.destroy()
+        if(this.home) this.home.destroy()
     }
     createChooseContainer(){
         this.chooseContainer = document.createElement('div');
