@@ -56,9 +56,6 @@ export default class Dialog extends Phaser.Scene {
         this.load.image('cloths_m_regular_6', require('../assets/Russell/cloths_m_regular_6.png').default )
         this.load.image('body_russell', require('../assets/Russell/face_m_1_body_m_regular_white_1.png').default )
     }
-    getJSON(){
-        this.load.text('dialog', '../assets/ons2.json');
-    }
     loadScene(){
         const dialog = JSON.parse(localStorage.getItem('heroes'))?.dialog  
         const bg = JSON.parse(localStorage.getItem('heroes'))?.bg 
