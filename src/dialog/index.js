@@ -7,6 +7,8 @@ export default class Dialog extends Phaser.Scene {
             i:0 ,
             bg:undefined
         }
+        this.timeMove;
+        this.timeNextScene;
         
     }
     setState(newState){
@@ -33,6 +35,7 @@ export default class Dialog extends Phaser.Scene {
         this.load.image('white_background', require('../assets/dialog/white_background.png').default )
         this.load.image('ellipse', require('../assets/dialog/Ellipse.png').default )
         this.load.image('phone', require('../assets/dialog/phone_bubble.png').default )
+        this.load.image('home', require('../assets/dialog/home.png').default)
     }
     getRussellAssets(){
         const emotions = ['angry', 'default', 'joy', 'sad', 'shy', 'surprised'];
@@ -53,7 +56,21 @@ export default class Dialog extends Phaser.Scene {
     getJSON(){
         this.load.text('dialog', '../assets/ons2.json');
     }
-
+    loadScene(){
+        const dialog = JSON.parse(localStorage.getItem('heroes'))?.dialog  
+        const bg = JSON.parse(localStorage.getItem('heroes'))?.bg 
+        if(dialog){
+            this.setState({
+                 i:dialog-1
+            })
+        }
+        if(bg){
+            this.setState({
+                bg
+            })
+            this.addBackground(bg)
+        }
+    }
     preload(){
         this.getEmotionAssets()
         this.getDialogAssets()
@@ -347,13 +364,29 @@ export default class Dialog extends Phaser.Scene {
         }
        localStorage.setItem('heroes',JSON.stringify(heroes))
        if(this.state.i<ons2.length){
-           setTimeout(()=>{
+           this.timeNextScene = setTimeout(()=>{
                 parent.runDialog()
            },4000)
        }
     }
     addBackground(bg){
         this.background = this.add.image(window.innerWidth/2, window.innerHeight/2, bg)
+    }
+    restartGame(){
+        const parent = this
+        this.home = this.add.sprite(window.innerWidth/2-120, window.innerHeight/2-300, 'home').setInteractive();
+        this.home.on('pointerdown', ()=>{
+            clearTimeout(parent.timeMove)
+            clearTimeout(parent.timeNextScene)
+            this.setState({
+                i:0,
+            })
+            this.setState({
+                bg:undefined
+            })
+            localStorage.removeItem('heroes')
+            parent.scene.start('Customization')
+        }).setDepth(15); 
     }
     runDialog(){  
         const parent = this
@@ -403,7 +436,7 @@ export default class Dialog extends Phaser.Scene {
                     this.createEclipces()
                 }
                 this.move(hero, 'right', )
-                setTimeout(()=>{
+                this.timeMove = setTimeout(()=>{
                     this.move(hero,'left')
                 },2000)
             }
@@ -417,7 +450,7 @@ export default class Dialog extends Phaser.Scene {
                     this.createEclipces('reflect')
                 }
                 this.move(hero, 'left')
-                setTimeout(()=>{
+                this.timeMove = setTimeout(()=>{
                     this.move(hero,'right')
                 },2000)
             }
@@ -427,10 +460,12 @@ export default class Dialog extends Phaser.Scene {
         this.save()
     }
     create(){
+        this.loadScene()
         this.preloadHeros()
         this.createHero('mainhero')  
         this.createHero('russell','reflect')
         this.runDialog()
+        this.restartGame()
     } 
     update(){
         

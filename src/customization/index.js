@@ -126,8 +126,9 @@ export default class Customization extends Phaser.Scene {
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
     itemChoosen(){
-       
         const parent = this;
+        this.itemOptions.forEach(item => item.destroy())
+        this.itemOptions=[]
         setTimeout(()=>{
            this.scene.start('Dialog')
         },2100)
@@ -156,7 +157,7 @@ export default class Customization extends Phaser.Scene {
         }
         if(this.left) this.left.destroy()
         if(this.right) this.right.destroy()
-        if(this.home) this.home.destroy()
+        if(this.finish) this.finish.destroy()
     }
     createChooseContainer(){
         this.chooseContainer = document.createElement('div');
@@ -238,9 +239,9 @@ export default class Customization extends Phaser.Scene {
         const parent = this;
         if(this.left) this.left.destroy()
         if(this.right) this.right.destroy()
-        if(this.home) this.home.destroy()
-        this.home = this.add.sprite(window.innerWidth/2+130, window.innerHeight-67, 'view').setInteractive();
-        this.home.on('pointerdown', ()=>{
+        if(this.finish) this.finish.destroy()
+        this.finish = this.add.sprite(window.innerWidth/2+130, window.innerHeight-67, 'view').setInteractive();
+        this.finish.on('pointerdown', ()=>{
             this.setState({
                 currentStep: 4
             })
