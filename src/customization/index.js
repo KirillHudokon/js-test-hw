@@ -30,7 +30,7 @@ export default class Customization extends Phaser.Scene {
         }catch(e){
             console.error(e.message)
         }
-        
+
     }
     getEmotions(id){
         const emotions = ['angry', 'default', 'joy', 'sad', 'shy', 'surprised'];
@@ -43,7 +43,7 @@ export default class Customization extends Phaser.Scene {
                 emotions:this.state.emotions ?  [...this.state.emotions,emotion] : [emotion]
             })
             }catch(e){
-               console.error(e.message)     
+               console.error(e.message)
             }
         })
     }
@@ -56,7 +56,7 @@ export default class Customization extends Phaser.Scene {
                 cloths:['cloths_f_regular_8', 'cloths_f_regular_9', 'cloths_f_regular_16']
             })
         }catch(e){
-            console.error(e.message)    
+            console.error(e.message)
         }
     }
     getHair(){
@@ -69,7 +69,7 @@ export default class Customization extends Phaser.Scene {
                 hair:['hair_f_3', 'hair_f_4', ]
             })
         }catch(e){
-            console.error(e.message)    
+            console.error(e.message)
         }
     }
     getExtraAssetsForCustomization(){
@@ -90,20 +90,20 @@ export default class Customization extends Phaser.Scene {
     }
     createHero(){
         const parent = this;
-        const localDate = JSON.parse(localStorage.getItem('heroes'))       
+        const localDate = JSON.parse(localStorage.getItem('heroes'))
         this.setState({
             currentStep: localDate?.currentStep||1
         })
         this.setState({
             hero_structure:{
                 body:{
-                    type:localDate?.mainhero_structure?.body||'body_white', 
-                    link(){ 
+                    type:localDate?.mainhero_structure?.body||'body_white',
+                    link(){
                         this.img = parent.add.sprite(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(1)
                         if(parent.state.hero_structure.emotion && parent.state.hero_structure.emotion.img){
                             parent.state.hero_structure.emotion.img.destroy()
                             if(this.type === 'body_white'){
-                                parent.state.hero_structure.emotion.type = 'face_f_1_default'     
+                                parent.state.hero_structure.emotion.type = 'face_f_1_default'
                             }
                             if(this.type === 'body_latino'){
                                 parent.state.hero_structure.emotion.type = 'face_f_3_default'
@@ -111,21 +111,21 @@ export default class Customization extends Phaser.Scene {
                             parent.state.hero_structure.emotion.link()
                         }
 
-                    },  
-                }, 
-                cloths: { 
-                    type: localDate?.mainhero_structure?.cloths||'cloths_f_regular_8', 
-                    link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(2)}, 
+                    },
+                },
+                cloths: {
+                    type: localDate?.mainhero_structure?.cloths||'cloths_f_regular_8',
+                    link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(2)},
                 },
                 emotion: {
                     type:localDate?.mainhero_structure?.emotion||'face_f_1_default',
-                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(3)}, 
+                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(3)},
                 },
-                hair: { 
-                    type:localDate?.mainhero_structure?.hair||'hair_f_3', 
+                hair: {
+                    type:localDate?.mainhero_structure?.hair||'hair_f_3',
                     link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(4)},
                 },
-            } 
+            }
         });
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
@@ -164,7 +164,7 @@ export default class Customization extends Phaser.Scene {
                 this.resetState()
                 this.scene.start('Dialog')
             },2100)
-        
+
     }
     createItemSelectionInfoView(){
         this.itemSelectionInfoView = document.createElement('div');
@@ -182,7 +182,7 @@ export default class Customization extends Phaser.Scene {
         this.confirmButton = document.createElement('div');
         this.confirmButton.className = 'confirmButton'
         this.confirmButton.innerHTML = 'Confirm'
-        this.confirmButton.onclick=()=>{ 
+        this.confirmButton.onclick=()=>{
             this.setState({
                 currentStep: parent.state.currentStep+1
             })
@@ -211,7 +211,7 @@ export default class Customization extends Phaser.Scene {
         if(where === 'right'){
             this.setState({
                 currentOption:this.state.currentOption+1
-            }) 
+            })
         }
         this.createArrows()
         this.createOptions()
@@ -219,12 +219,12 @@ export default class Customization extends Phaser.Scene {
     changeHeroStructure(){
         const parent = this
         const currentStepName = this.state.steps[this.state.currentStep-1]
-        this.state.hero_structure[currentStepName].img.destroy() 
+        this.state.hero_structure[currentStepName].img.destroy()
         this.setState({
             hero_structure:{
                  ...parent.state.hero_structure,
                 [currentStepName]: {...this.state.hero_structure[currentStepName],type: this.state[currentStepName][this.state.currentOption-1]},
-             } 
+             }
          })
          this.state.hero_structure[currentStepName].link()
     }
@@ -252,12 +252,12 @@ export default class Customization extends Phaser.Scene {
             this.confirmButton.remove()
             this.itemSelectionInfoView.remove()
             this.choosenHeroView()
-        }); 
+        });
         this.left = this.add.sprite(window.innerWidth/2-160, window.innerHeight/2, 'arrow').setInteractive().setScale(0.7);
-        this.left.on('pointerdown', ()=>this.changeCurrentOption('left')); 
+        this.left.on('pointerdown', ()=>this.changeCurrentOption('left'));
         this.right = this.add.sprite(window.innerWidth/2+160, window.innerHeight/2, 'arrow').setInteractive().setScale(0.7)
         this.right.angle = 180
-        this.right.on('pointerdown', ()=>this.changeCurrentOption('right')); 
+        this.right.on('pointerdown', ()=>this.changeCurrentOption('right'));
         if(this.state.currentOption === 1) this.left.destroy()
         if(this.state.currentOption === this.state[this.state.steps[this.state.currentStep-1]].length) this.right.destroy()
     }
@@ -265,13 +265,13 @@ export default class Customization extends Phaser.Scene {
         this.itemOptions.forEach(item=>item.destroy())
         this.itemOptions=[]
         let margin = -((15 * this.state[this.state.steps[this.state.currentStep-1]].length)/2)/2
-       
+
         for(let i=0; i < this.state[this.state.steps[this.state.currentStep-1]].length; i++){
             if(i === this.state.currentOption-1){
                 this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight/2+131, 'active').setInteractive().setDepth(8).on('pointerdown', ()=>{
                     this.setState({
                         currentOption:i+1
-                    }) 
+                    })
                     this.createOptions()
                     this.createArrows()
                  }))
@@ -280,13 +280,13 @@ export default class Customization extends Phaser.Scene {
                     this.setState({
                         currentOption:i+1
                     })
-                    this.createOptions() 
+                    this.createOptions()
                     this.createArrows()
                  }))
             }
             margin+=15
         }
-    
+
     }
     addBackground(){
         this.add.image(window.innerWidth/2, window.innerHeight/2, 'customization_bg')
@@ -303,7 +303,7 @@ export default class Customization extends Phaser.Scene {
             this.createArrows()
             this.createOptions()
         }
-        
+
     }
     update(){
         if(this.state.currentStep !==4){
@@ -312,4 +312,4 @@ export default class Customization extends Phaser.Scene {
             this.itemPositionView.innerHTML = `Choose option ${this.state.currentOption}/${this.state[this.state.steps[this.state.currentStep-1]].length}`
         }
     }
-} 
+}

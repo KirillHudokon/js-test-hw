@@ -391,7 +391,7 @@ export default class Dialog extends Phaser.Scene {
     }
     restartGame(){
         const parent = this
-        this.home = this.add.sprite(window.innerWidth/2-120, window.innerHeight/2-300, 'home').setInteractive();
+        this.home = this.add.sprite(window.innerWidth/2-120, window.innerHeight/2-270, 'home').setInteractive();
         this.home.on('pointerdown', ()=>{
             clearTimeout(parent.timeMove)
             clearTimeout(parent.timeNextScene)
