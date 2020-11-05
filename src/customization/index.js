@@ -1,13 +1,13 @@
 import Phaser from "phaser"
-
+const initialState = {
+    steps:['body', 'hair', 'cloths'],
+    currentStep:1,
+    currentOption:1
+}
 export default class Customization extends Phaser.Scene {
     constructor(){
         super('Customization')
-        this.state = {
-            steps:['body', 'hair', 'cloths'],
-            currentStep:1,
-            currentOption:1
-        }
+        this.state = initialState
         this.setState = this.setState.bind(this)
         this.itemPositionView;
         this.itemSelectionTypeInfo;
@@ -15,6 +15,9 @@ export default class Customization extends Phaser.Scene {
     }
     setState(newState){
         this.state = {...this.state,...newState}
+    }
+    resetState(){
+        this.state = initialState
     }
     getBody(id,type){
         try{
@@ -127,7 +130,7 @@ export default class Customization extends Phaser.Scene {
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
     choosenHeroView(){
-        if(!this.choosenHeroTitle){
+      
             this.itemOptions.forEach(item => item.destroy())
             this.itemOptions=[]
             this.choosenHeroTitle = document.createElement('div');
@@ -141,10 +144,6 @@ export default class Customization extends Phaser.Scene {
             if(this.left) this.left.destroy()
             if(this.right) this.right.destroy()
             if(this.finish) this.finish.destroy()
-            setTimeout(()=>{
-                this.choosenHeroTitle.remove()
-                this.scene.start('Dialog')
-            },2100)
             const fadeDelay={
                 body:1,
                 face:0.1,
@@ -160,9 +159,15 @@ export default class Customization extends Phaser.Scene {
                     ease: 'Power2'
                 }, this);
             })
-        }
+            setTimeout(()=>{
+                this.choosenHeroTitle.remove()
+                this.resetState()
+                this.scene.start('Dialog')
+            },2100)
+        
     }
     createItemSelectionInfoView(){
+        console.log(this.state,1)
         this.itemSelectionInfoView = document.createElement('div');
         this.itemPositionView = document.createElement('div');
         this.itemSelectionTypeInfo = document.createElement('div');
@@ -179,6 +184,7 @@ export default class Customization extends Phaser.Scene {
         this.confirmButton.className = 'confirmButton'
         this.confirmButton.innerHTML = 'Confirm'
         this.confirmButton.onclick=()=>{ 
+            console.log(this.state,'confirm')
             this.setState({
                 currentStep: parent.state.currentStep+1
             })
@@ -290,15 +296,16 @@ export default class Customization extends Phaser.Scene {
     create(){
         this.createHero()
         if(this.state.currentStep === 4){
+            this.resetState()
             this.scene.start('Dialog')
-        }
-        if(this.state.currentStep !==4){
+        }else{
             this.addBackground()
             this.createItemSelectionInfoView();
             this.createConfirmButton();
             this.createArrows()
             this.createOptions()
         }
+        
     }
     update(){
         if(this.state.currentStep !==4){

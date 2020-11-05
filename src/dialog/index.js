@@ -247,8 +247,8 @@ export default class Dialog extends Phaser.Scene {
         })
     }
     createFrame(){
-        this.frameBackground= this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'white_background').setDepth(9)
-        this.frame= this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'bg').setDepth(10)
+        this.frameBackground= this.add.sprite(window.innerWidth/2, window.innerHeight/2, 'white_background').setDepth(9)
+        this.frame= this.add.sprite(window.innerWidth/2, window.innerHeight/2, 'bg').setDepth(10)
     }
     createFrameWithTitle(type){
         this.frameBackground= this.add.sprite(window.innerWidth/2, window.innerHeight/2+148, 'white_background').setDepth(9)
@@ -258,7 +258,7 @@ export default class Dialog extends Phaser.Scene {
 
      }
     createText(text){
-        this.label = this.add.text(window.innerWidth/2-148, window.innerHeight/2+105, '', {
+        this.label = this.add.text(window.innerWidth/2-148,this.frame ? window.innerHeight/2-40  : window.innerHeight/2+105 , '', {
             align:'center', 
             color:'#141A3D', 
             fontFamily: 'Nunito Sans Bold',
@@ -393,7 +393,6 @@ export default class Dialog extends Phaser.Scene {
     }
     runDialog(){  
         const parent = this
-        console.log(this.state.i)
         const chooseEmotion = (hero) => {
             if(hero === 'mainhero'){
                 if(parent.state[hero].body.type === 'body_latino') return 'face_f_3_'+ons2[parent.state.i].emotion
@@ -409,7 +408,10 @@ export default class Dialog extends Phaser.Scene {
         if(ons2[this.state.i].type === 'middle'){
             if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
             if(this.frameBackground) this.frameBackground.destroy()
-            if(this.frame) this.frame.destroy()
+            if(this.frame){
+                this.frame.destroy()
+                this.frame = null
+            } 
             if(this.frameWithTitle) this.frameWithTitle.destroy()
             if(this.title) this.title.destroy()
             if(this.label) this.label.destroy()
@@ -421,7 +423,10 @@ export default class Dialog extends Phaser.Scene {
             if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
             if(this.frameBackground) this.frameBackground.destroy()
             if(this.frameWithTitle) this.frameWithTitle.destroy()
-            if(this.frame) this.frame.destroy()
+            if(this.frame){
+                this.frame.destroy()
+                this.frame = null
+            } 
             if(this.title) this.title.destroy()
             if(this.label) this.label.destroy()
             Object.values(this.state[hero]).forEach(item=> item.img.destroy())
