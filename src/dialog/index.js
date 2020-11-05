@@ -9,7 +9,7 @@ export default class Dialog extends Phaser.Scene {
         }
         this.timeMove;
         this.timeNextScene;
-        
+
     }
     setState(newState){
         this.state = {...this.state,...newState}
@@ -22,7 +22,7 @@ export default class Dialog extends Phaser.Scene {
                 const path = require(`../assets/background eclipces/${emotion[0].toUpperCase()}${emotion.slice(1)}.png`).default
                 this.load.image(name, path);
             }catch(e){
-                console.error(e.message)     
+                console.error(e.message)
             }
         })
         this.load.image('vision', require('../assets/background eclipces/Default.png').default);
@@ -48,7 +48,7 @@ export default class Dialog extends Phaser.Scene {
             const path = require(`../assets/Russell/emotions/face_m_1_${emotion}.png`).default
             this.load.image(name, path);
             }catch(e){
-               console.error(e.message)     
+               console.error(e.message)
             }
         })
         this.load.image('hair_m_4', require('../assets/Russell/hair/hair_m_4.png').default )
@@ -57,8 +57,8 @@ export default class Dialog extends Phaser.Scene {
         this.load.image('body_russell', require('../assets/Russell/face_m_1_body_m_regular_white_1.png').default )
     }
     loadScene(){
-        const dialog = JSON.parse(localStorage.getItem('heroes'))?.dialog  
-        const bg = JSON.parse(localStorage.getItem('heroes'))?.bg 
+        const dialog = JSON.parse(localStorage.getItem('heroes'))?.dialog
+        const bg = JSON.parse(localStorage.getItem('heroes'))?.bg
         if(dialog){
             this.setState({
                  i:dialog-1
@@ -77,12 +77,12 @@ export default class Dialog extends Phaser.Scene {
         this.getRussellAssets()
     }
     preloadHeros(){
-        const mainhero = JSON.parse(localStorage.getItem('heroes'))?.mainhero_structure  
-        const russell = JSON.parse(localStorage.getItem('heroes'))?.russell_structure  
+        const mainhero = JSON.parse(localStorage.getItem('heroes'))?.mainhero_structure
+        const russell = JSON.parse(localStorage.getItem('heroes'))?.russell_structure
         this.setState({
             mainhero
         })
-  
+
         this.setState({
             russell: russell ? russell : {
                 emotion: 'face_m_1_default',
@@ -91,13 +91,13 @@ export default class Dialog extends Phaser.Scene {
                 body:'body_russell',
             }
         })
-    
+
 
     }
     createHero(who,type){
         const parent = this
         const hero_structure = this.state[who]
-        
+
         const bgEmotionName = hero_structure.emotion.split('_')
         const x = type === 'reflect' ? window.innerWidth/2+280 : window.innerWidth/2-280;
         const y =window.innerHeight/2+10;
@@ -111,13 +111,13 @@ export default class Dialog extends Phaser.Scene {
                 [sup]:{
                     bg_emotion:{
                         link(){
-                            this.img = type === 'reflect' ? 
+                            this.img = type === 'reflect' ?
                             parent.make.image({
                                 x,
                                 y,
                                 key: bgEmotionName[bgEmotionName.length-1],
                                 add: true
-                            }).setScale(0.3).setDepth(1).setFlip(true,false) : 
+                            }).setScale(0.3).setDepth(1).setFlip(true,false) :
                             parent.make.image({
                                 x,
                                 y,
@@ -129,13 +129,13 @@ export default class Dialog extends Phaser.Scene {
                 }
             }
         })
-    
+
         this.setState({
             [who]:{
                 ...this.state[who],
                 body:{
                     type:hero_structure.body,
-                    link(){ 
+                    link(){
                         this.img = type === 'reflect' ?
                             parent.make.image({
                                 x,
@@ -149,11 +149,11 @@ export default class Dialog extends Phaser.Scene {
                                 key: hero_structure.body,
                                 add: true
                             }).setScale(0.3).setDepth(2)
-                    }, 
-                }, 
-                cloths: { 
+                    },
+                },
+                cloths: {
                     type:hero_structure.cloths,
-                    link(){ 
+                    link(){
                         this.img = type === 'reflect' ?
                         parent.make.image({
                             x,
@@ -167,11 +167,11 @@ export default class Dialog extends Phaser.Scene {
                             key: hero_structure.cloths,
                             add: true
                         }).setScale(0.3).setDepth(3)
-                    }, 
+                    },
                 },
                 emotion: {
                     type:hero_structure.emotion,
-                    link(){ 
+                    link(){
                         this.img = type === 'reflect' ?
                         parent.make.image({
                             x,
@@ -185,11 +185,11 @@ export default class Dialog extends Phaser.Scene {
                             key: hero_structure.emotion,
                             add: true
                         }).setScale(0.3).setDepth(4)
-                    }, 
+                    },
                 },
-                hair: { 
+                hair: {
                     type:hero_structure.hair,
-                    link(){ 
+                    link(){
                         this.img = type === 'reflect' ?
                         parent.make.image({
                             x,
@@ -205,9 +205,9 @@ export default class Dialog extends Phaser.Scene {
                         }).setScale(0.3).setDepth(5)
                     },
                 },
-            } 
-        }); 
-        
+            }
+        });
+
         this.setState({
             [who]:{
                 ...this.state[who],
@@ -215,13 +215,13 @@ export default class Dialog extends Phaser.Scene {
                     ...parent.state[who][sup],
                     checker:{
                         link(){
-                            this.img = type === 'reflect' ? 
+                            this.img = type === 'reflect' ?
                             parent.make.sprite({
                                 x:x-16,
                                 y:y-50,
                                 key: 'vision',
                                 add: false
-                            }).setScale(0.40) : 
+                            }).setScale(0.40) :
                             parent.make.sprite({
                                 x:x+23,
                                 y:y-50,
@@ -233,11 +233,11 @@ export default class Dialog extends Phaser.Scene {
                 }
             }
         })
-  
+
         this.state[who][sup].bg_emotion.link()
         this.state[who][sup].checker.link()
         this.state[who][sup].checker.img.angle = 45
-       
+
         Object.values(this.state[who]).forEach(item=> item.link())
         Object.values(this.state[who]).forEach((item)=>{
             item.img.mask = new Phaser.Display.Masks.BitmapMask(this, this.state[who][sup].checker.img);
@@ -249,19 +249,19 @@ export default class Dialog extends Phaser.Scene {
     }
     createFrameWithTitle(type){
         this.frameBackground= this.add.sprite(window.innerWidth/2, window.innerHeight/2+148, 'white_background').setDepth(9)
-        this.frameWithTitle = type === 'reflect' ? 
+        this.frameWithTitle = type === 'reflect' ?
             this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'bg_with_title').setDepth(10).setFlip(true,false) :
             this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'bg_with_title').setDepth(10)
 
      }
     createText(text){
         this.label = this.add.text(window.innerWidth/2-148,this.frame ? window.innerHeight/2-40  : window.innerHeight/2+105 , '', {
-            align:'center', 
-            color:'#141A3D', 
+            align:'center',
+            color:'#141A3D',
             fontFamily: 'Nunito Sans Bold',
             fontSize:'17px'
         }).setWordWrapWidth(300,false).setDepth(11)
-        
+
         this.typewriteText(text)
     }
     createEclipces(type){
@@ -293,17 +293,17 @@ export default class Dialog extends Phaser.Scene {
     }
     addTitle(text = '', type){
         const titleConfig = {
-            align:'center', 
-            color:'white', 
+            align:'center',
+            color:'white',
             fontSize:'20px',
             fontFamily: 'Arial'
         }
-        this.title = type === 'reflect' ? 
+        this.title = type === 'reflect' ?
             this.add.text(window.innerWidth/2-100, window.innerHeight/2+78, text, titleConfig).setDepth(11):
             this.add.text(window.innerWidth/2+35, window.innerHeight/2+78, text, titleConfig).setDepth(11)
-     
+
     }
-     typewriteText(text){   
+     typewriteText(text){
         const length = text.length
         let i = 0
          this.time.addEvent({
@@ -314,21 +314,21 @@ export default class Dialog extends Phaser.Scene {
             repeat: length - 1,
             delay: 5
         })
-        
+
     }
     move(who,side){
         let i = 0
         this.time.addEvent({
             callback: () => {
                 if(side === 'right' ){
-             
+
                     Object.values(this.state[who]).forEach(item=> item.img.x+=i)
                     this.state[who][this.state[`${who}_key`]].bg_emotion.img.x+=i
                     this.state[who][this.state[`${who}_key`]].checker.img.x+=i
                     ++i
                 }
                 if(side === 'left' ){
-               
+
                     Object.values(this.state[who]).forEach(item=> item.img.x+=i)
                     this.state[who][this.state[`${who}_key`]].bg_emotion.img.x+=i
                     this.state[who][this.state[`${who}_key`]].checker.img.x+=i
@@ -345,11 +345,11 @@ export default class Dialog extends Phaser.Scene {
         this.time.addEvent({
             callback: () => {
                 if(side === 'right' ){
-                    this.cameras.main.scrollX+=i  
+                    this.cameras.main.scrollX+=i
                     ++i
                 }
-                if(side === 'left' ){      
-                 this.cameras.main.scrollX+=i 
+                if(side === 'left' ){
+                 this.cameras.main.scrollX+=i
                     --i
                 }
             },
@@ -391,7 +391,7 @@ export default class Dialog extends Phaser.Scene {
     }
     restartGame(){
         const parent = this
-        this.home = this.add.sprite(window.innerWidth/2-120, window.innerHeight/2-300, 'home').setInteractive();
+        this.home = this.add.sprite(window.innerWidth/2-120, window.innerHeight/2-270, 'home').setInteractive();
         this.home.on('pointerdown', ()=>{
             clearTimeout(parent.timeMove)
             clearTimeout(parent.timeNextScene)
@@ -403,16 +403,16 @@ export default class Dialog extends Phaser.Scene {
             })
             localStorage.removeItem('heroes')
             parent.scene.start('Customization')
-        }).setDepth(15); 
+        }).setDepth(15);
     }
-    runDialog(){  
+    runDialog(){
         const parent = this
         const chooseEmotion = (hero) => {
             if(hero === 'mainhero'){
                 if(parent.state[hero].body.type === 'body_latino') return 'face_f_3_'+ons2[parent.state.i].emotion
                 if(parent.state[hero].body.type === 'body_white') return 'face_f_1_'+ons2[parent.state.i].emotion
-            } 
-            return 'face_m_1_'+ons2[parent.state.i].emotion 
+            }
+            return 'face_m_1_'+ons2[parent.state.i].emotion
         }
         if(ons2[this.state.i].backgroundName){
             if(this.background) this.background.destroy()
@@ -426,7 +426,7 @@ export default class Dialog extends Phaser.Scene {
             if(this.frame){
                 this.frame.destroy()
                 this.frame = null
-            } 
+            }
             if(this.frameWithTitle) this.frameWithTitle.destroy()
             if(this.title) this.title.destroy()
             if(this.label) this.label.destroy()
@@ -441,7 +441,7 @@ export default class Dialog extends Phaser.Scene {
             if(this.frame){
                 this.frame.destroy()
                 this.frame = null
-            } 
+            }
             if(this.title) this.title.destroy()
             if(this.label) this.label.destroy()
             Object.values(this.state[hero]).forEach(item=> item.img.destroy())
@@ -488,7 +488,7 @@ export default class Dialog extends Phaser.Scene {
                     this.cameraMove('left')
                 },2000)
             }
-            
+
             this.createText(ons2[this.state.i].text)
         }
         this.save()
@@ -496,12 +496,12 @@ export default class Dialog extends Phaser.Scene {
     create(){
         this.loadScene()
         this.preloadHeros()
-        this.createHero('mainhero')  
+        this.createHero('mainhero')
         this.createHero('russell','reflect')
         this.runDialog()
         this.restartGame()
-    } 
+    }
     update(){
-        
-    }  
-} 
+
+    }
+}
