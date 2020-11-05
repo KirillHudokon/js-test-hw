@@ -391,6 +391,13 @@ export default class Dialog extends Phaser.Scene {
     runDialog(){  
         const parent = this
         console.log(this.state.i)
+        const chooseEmotion = (hero) => {
+            if(hero === 'mainhero'){
+                if(parent.state[hero].body.type === 'body_latino') return 'face_f_3_'+ons2[parent.state.i].emotion
+                if(parent.state[hero].body.type === 'body_white') return 'face_f_1_'+ons2[parent.state.i].emotion
+            } 
+            return 'face_m_1_'+ons2[parent.state.i].emotion 
+        }
         if(ons2[this.state.i].backgroundName){
             if(this.background) this.background.destroy()
             this.addBackground(ons2[this.state.i].backgroundName)
@@ -421,7 +428,7 @@ export default class Dialog extends Phaser.Scene {
                 [hero]:{
                     hair:parent.state[hero].hair.type,
                     body:parent.state[hero].body.type,
-                    emotion: hero === 'mainhero' ? 'face_f_1_'+ons2[parent.state.i].emotion : 'face_m_1_'+ons2[parent.state.i].emotion ,
+                    emotion: chooseEmotion(hero) ,
                     cloths:parent.state[hero].cloths.type,
                 }
             })
