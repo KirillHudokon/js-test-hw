@@ -15,13 +15,16 @@ export default class Dialog extends Phaser.Scene {
         this.state = {...this.state,...newState}
     }
     getEmotionAssets(){
-        this.load.image('angry', require('../assets/background eclipces/Angry.png').default);
-        this.load.image('default', require('../assets/background eclipces/Default.png').default);
-        this.load.image('flirty', require('../assets/background eclipces/Flirty.png').default);
-        this.load.image('happy', require('../assets/background eclipces/Happy.png').default);
-        this.load.image('sad', require('../assets/background eclipces/Sad.png').default);
-        this.load.image('shy', require('../assets/background eclipces/Shy.png').default);
-        this.load.image('surprised', require('../assets/background eclipces/Surprised.png').default);
+        const emotions = ['angry', 'default', 'flirty', 'happy', 'sad', 'shy', 'surprised'];
+        emotions.forEach(emotion => {
+            try{
+                const name = emotion
+                const path = require(`../assets/background eclipces/${emotion[0].toUpperCase()}${emotion.slice(1)}.png`).default
+                this.load.image(name, path);
+            }catch(e){
+                console.error(e.message)     
+            }
+        })
         this.load.image('vision', require('../assets/background eclipces/Default.png').default);
     }
     getDialogAssets(){

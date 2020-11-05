@@ -9,8 +9,8 @@ export default class Customization extends Phaser.Scene {
             currentOption:1
         }
         this.setState = this.setState.bind(this)
-        this.itemOptionsText;
-        this.containerText;
+        this.itemPositionView;
+        this.itemSelectionTypeInfo;
         this.itemOptions=[]
     }
     setState(newState){
@@ -69,11 +69,12 @@ export default class Customization extends Phaser.Scene {
             console.error(e.message)    
         }
     }
-    getAssets(){
-        this.load.image('vector', require('../assets/Vector.png').default);
-        this.load.image('view', require('../assets/view.png').default);
-        this.load.image('inactive', require('../assets/inActive.png').default);
-        this.load.image('active', require('../assets/active.png').default);
+    getExtraAssetsForCustomization(){
+        this.load.image('arrow', require('../assets/customization/Vector.png').default);
+        this.load.image('finish', require('../assets/customization/view.png').default);
+        this.load.image('inactive', require('../assets/customization/inActive.png').default);
+        this.load.image('active', require('../assets/customization/active.png').default);
+        this.load.image('customization_bg', require('../assets/Backgrounds/customization_bg.jpg').default);
     }
     preload(){
         this.getBody(1,'white')
@@ -82,7 +83,7 @@ export default class Customization extends Phaser.Scene {
         this.getEmotions(3)
         this.getClothes()
         this.getHair()
-        this.getAssets()
+        this.getExtraAssetsForCustomization()
     }
     createHero(){
         const parent = this;
@@ -95,7 +96,7 @@ export default class Customization extends Phaser.Scene {
                 body:{
                     type:localDate?.mainhero_structure?.body||'body_white', 
                     link(){ 
-                        this.img = parent.add.sprite(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1)
+                        this.img = parent.add.sprite(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(1)
                         if(parent.state.hero_structure.emotion && parent.state.hero_structure.emotion.img){
                             parent.state.hero_structure.emotion.img.destroy()
                             if(this.type === 'body_white'){
@@ -111,74 +112,71 @@ export default class Customization extends Phaser.Scene {
                 }, 
                 cloths: { 
                     type: localDate?.mainhero_structure?.cloths||'cloths_f_regular_8', 
-                    link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(2)}, 
+                    link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(2)}, 
                 },
                 emotion: {
                     type:localDate?.mainhero_structure?.emotion||'face_f_1_default',
-                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(3)}, 
+                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(3)}, 
                 },
                 hair: { 
                     type:localDate?.mainhero_structure?.hair||'hair_f_3', 
-                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(4)},
+                    link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight/2,this.type).setScale(0.4).setDepth(4)},
                 },
             } 
         });
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
-    itemChoosen(){
-        const parent = this;
-        this.itemOptions.forEach(item => item.destroy())
-        this.itemOptions=[]
-        setTimeout(()=>{
-           this.scene.start('Dialog')
-        },2100)
-        const fadeDelay={
-            body:1,
-            face:0.1,
-            cloths: 1.5,
-            hair:2
-        }
-        Object.values(parent.state.hero_structure).forEach((structureItem,i)=>{
-        const findedStructureItem = Object.entries(fadeDelay).find(delayItem => structureItem.type.indexOf(delayItem[0])!==-1)
-            parent.tweens.add({
-                targets: structureItem.img,
-                alpha: 0,
-                duration: findedStructureItem[1]*1000,
-                ease: 'Power2'
-            }, parent);
-        })
-        const choosen = document.createElement('div');
-        choosen.innerHTML = 'Item choosen'.toUpperCase();
-        choosen.style='width: 252px;height: 40px; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 100%), rgba(191, 16, 90, 0.8); border: 1px solid rgba(243, 76, 116, 0.6); box-sizing: border-box; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:16px; font-family: Nunito Sans Bold; line-height: 32px; text-align:center; color:white; text-align:center'
-        this.add.dom(window.innerWidth/2, window.innerHeight-450, choosen);
-        if(this.itemOptions.length){
-            this.itemOptions.forEach(item=>item.destroy())
+    choosenHeroView(){
+        if(!this.choosenHeroTitle){
+            this.itemOptions.forEach(item => item.destroy())
             this.itemOptions=[]
+            this.choosenHeroTitle = document.createElement('div');
+            this.choosenHeroTitle.innerHTML = 'Item choosen'.toUpperCase();
+            this.choosenHeroTitle.className='choosenHeroTitle'
+            this.add.dom(window.innerWidth/2, window.innerHeight/2-315, this.choosenHeroTitle);
+            if(this.itemOptions.length){
+                this.itemOptions.forEach(item=>item.destroy())
+                this.itemOptions=[]
+            }
+            if(this.left) this.left.destroy()
+            if(this.right) this.right.destroy()
+            if(this.finish) this.finish.destroy()
+            setTimeout(()=>{
+                this.choosenHeroTitle.remove()
+                this.scene.start('Dialog')
+            },2100)
+            const fadeDelay={
+                body:1,
+                face:0.1,
+                cloths: 1.5,
+                hair:2
+            }
+            Object.values(this.state.hero_structure).forEach((structureItem,i)=>{
+            const findedStructureItem = Object.entries(fadeDelay).find(delayItem => structureItem.type.indexOf(delayItem[0])!==-1)
+            this.tweens.add({
+                    targets: structureItem.img,
+                    alpha: 0,
+                    duration: findedStructureItem[1]*1000,
+                    ease: 'Power2'
+                }, this);
+            })
         }
-        if(this.left) this.left.destroy()
-        if(this.right) this.right.destroy()
-        if(this.finish) this.finish.destroy()
     }
-    createChooseContainer(){
-        this.chooseContainer = document.createElement('div');
-        this.itemOptionsText = document.createElement('div');
-        this.containerText = document.createElement('div');
-        this.chooseContainer.style = "postition: relative; background: rgba(255, 255, 255, 0.8); width: 288px; height:88px; box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 12px; font-size: 20px; text-align: center; color: #141A3D; overflow:hidden; font-weight:400; font-weight:normal; font-family: Nunito Sans Bold"
-        this.itemOptionsText.style = "width: 120px;height: 25px; margin:0px auto 22px; margin-bottom:20px; background: linear-gradient(180deg, #F48BB8 0%, #ED5C9A 100%);border: 1px solid #FBD4E5;box-sizing: border-box;box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15), inset 1px -2px 2px rgba(232, 131, 173, 0.25); border-bottom-left-radius:24px; border-bottom-right-radius: 24px; font-size:10px; display:flex; align-items: center; justify-content:center; color:white "
-        this.itemOptionsText.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep-1]].length}`
-        this.containerText.innerHTML = 'Choose your hair'
-        this.chooseContainer.append(this.itemOptionsText,this.containerText)
-        this.add.dom(window.innerWidth/2, window.innerHeight-148, this.chooseContainer);
-    }
-    createOptionsContainer(){
-        const optionsContainer = document.createElement('div'); 
-        optionsContainer.style = 'width: 252px; display:flex; align-items:center; justify-content:center'
-        this.add.dom(window.innerWidth/2, window.innerHeight-204, optionsContainer);
+    createItemSelectionInfoView(){
+        this.itemSelectionInfoView = document.createElement('div');
+        this.itemPositionView = document.createElement('div');
+        this.itemSelectionTypeInfo = document.createElement('div');
+        this.itemSelectionInfoView.className = "itemSelectionInfoView"
+        this.itemPositionView.className = "itemPositionView"
+        this.itemPositionView.innerHTML = `Choose option 1/${this.state[this.state.steps[this.state.currentStep-1]].length}`
+        this.itemSelectionTypeInfo.innerHTML = 'Choose your hair'
+        this.itemSelectionInfoView.append(this.itemPositionView,this.itemSelectionTypeInfo)
+        this.add.dom(window.innerWidth/2, window.innerHeight/2 + 190, this.itemSelectionInfoView);
     }
     createConfirmButton(){
         const parent=this;
         this.confirmButton = document.createElement('div');
-        this.confirmButton.style = 'position: absolute; width:216px; height:42px; background: linear-gradient(180deg, #DB5186 0%, #C6236A 100%); border: 2px solid #D34E7E;box-sizing: border-box;box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.24); border-radius: 30px; line-height:34.5px; font-family: Nunito Sans Bold; color:white; font-size:15px; text-align:center'
+        this.confirmButton.className = 'confirmButton'
         this.confirmButton.innerHTML = 'Confirm'
         this.confirmButton.onclick=()=>{ 
             this.setState({
@@ -187,27 +185,18 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentOption:1
             })
-            let heroes = {
-                currentStep: this.state.currentStep,
-                mainhero_structure:{
-                    hair:this.state.hero_structure.hair.type,
-                    body:this.state.hero_structure.body.type,
-                    emotion:this.state.hero_structure.emotion.type,
-                    cloths:this.state.hero_structure.cloths.type,
-                }
-            }
-            localStorage.setItem('heroes',JSON.stringify(heroes))
+            localStorage.setItem('heroes',JSON.stringify(this.getHeroStructure()))
             if(this.state.currentStep === 4) {
                 this.confirmButton.remove()
-                this.chooseContainer.remove()
-                this.itemChoosen()
+                this.itemSelectionInfoView.remove()
+                this.choosenHeroView()
             }
             if(this.state.currentStep !==4){
                 this.createOptions()
                 this.createArrows()
             }
         }
-        this.add.dom(window.innerWidth/2, window.innerHeight-69, this.confirmButton);
+        this.add.dom(window.innerWidth/2, window.innerHeight/2+280, this.confirmButton);
     }
     changeCurrentOption(where){
         if(where === 'left'){
@@ -235,47 +224,47 @@ export default class Customization extends Phaser.Scene {
          })
          this.state.hero_structure[currentStepName].link()
     }
+    getHeroStructure(){
+        return {
+            currentStep: this.state.currentStep,
+            mainhero_structure:{
+                hair:this.state.hero_structure.hair.type,
+                body:this.state.hero_structure.body.type,
+                emotion:this.state.hero_structure.emotion.type,
+                cloths:this.state.hero_structure.cloths.type,
+            }
+        }
+    }
     createArrows(){
-        const parent = this;
         if(this.left) this.left.destroy()
         if(this.right) this.right.destroy()
         if(this.finish) this.finish.destroy()
-        this.finish = this.add.sprite(window.innerWidth/2+130, window.innerHeight-67, 'view').setInteractive();
+        this.finish = this.add.sprite(window.innerWidth/2+130, window.innerHeight/2+280, 'finish').setInteractive();
         this.finish.on('pointerdown', ()=>{
             this.setState({
                 currentStep: 4
             })
-            let heroes = {
-                currentStep: this.state.currentStep,
-                mainhero_structure:{
-                    hair:this.state.hero_structure.hair.type,
-                    body:this.state.hero_structure.body.type,
-                    emotion:this.state.hero_structure.emotion.type,
-                    cloths:this.state.hero_structure.cloths.type,
-                }
-            }
-            localStorage.setItem('heroes',JSON.stringify(heroes))
+            localStorage.setItem('heroes',JSON.stringify(this.getHeroStructure()))
             this.confirmButton.remove()
-            this.chooseContainer.remove()
-            this.itemChoosen()
+            this.itemSelectionInfoView.remove()
+            this.choosenHeroView()
         }); 
-        this.left = this.add.sprite(window.innerWidth/2-130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7);
+        this.left = this.add.sprite(window.innerWidth/2-160, window.innerHeight/2, 'arrow').setInteractive().setScale(0.7);
         this.left.on('pointerdown', ()=>this.changeCurrentOption('left')); 
-        this.right = this.add.sprite(window.innerWidth/2+130, window.innerHeight-267, 'vector').setInteractive().setScale(0.7)
+        this.right = this.add.sprite(window.innerWidth/2+160, window.innerHeight/2, 'arrow').setInteractive().setScale(0.7)
         this.right.angle = 180
         this.right.on('pointerdown', ()=>this.changeCurrentOption('right')); 
         if(this.state.currentOption === 1) this.left.destroy()
         if(this.state.currentOption === this.state[this.state.steps[this.state.currentStep-1]].length) this.right.destroy()
     }
     createOptions(){
-        const parent = this
         this.itemOptions.forEach(item=>item.destroy())
         this.itemOptions=[]
         let margin = -((15 * this.state[this.state.steps[this.state.currentStep-1]].length)/2)/2
        
         for(let i=0; i < this.state[this.state.steps[this.state.currentStep-1]].length; i++){
             if(i === this.state.currentOption-1){
-                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-203, 'active').setInteractive().setDepth(8).on('pointerdown', ()=>{
+                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight/2+131, 'active').setInteractive().setDepth(8).on('pointerdown', ()=>{
                     this.setState({
                         currentOption:i+1
                     }) 
@@ -283,7 +272,7 @@ export default class Customization extends Phaser.Scene {
                     this.createArrows()
                  }))
             }else{
-                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight-204, 'inactive').setInteractive().setDepth(8).on('pointerdown', ()=>{
+                this.itemOptions.push(this.add.sprite(window.innerWidth/2+margin, window.innerHeight/2+130, 'inactive').setInteractive().setDepth(8).on('pointerdown', ()=>{
                     this.setState({
                         currentOption:i+1
                     })
@@ -295,31 +284,27 @@ export default class Customization extends Phaser.Scene {
         }
     
     }
-    itemChosenView(){
-       
+    addBackground(){
+        this.add.image(window.innerWidth/2, window.innerHeight/2, 'customization_bg')
     }
     create(){
-        this.createHero();
+        this.createHero()
         if(this.state.currentStep === 4){
             this.scene.start('Dialog')
         }
         if(this.state.currentStep !==4){
-            this.createChooseContainer();
-            this.createOptionsContainer();
+            this.addBackground()
+            this.createItemSelectionInfoView();
             this.createConfirmButton();
             this.createArrows()
             this.createOptions()
         }
     }
     update(){
-        if(this.state.currentStep === 4){
-            console.log(true)
-            //this.itemChoosen()
-        }
         if(this.state.currentStep !==4){
             this.changeHeroStructure()
-            this.containerText.innerHTML = `Choose your ${this.state.steps[this.state.currentStep-1]}`
-            this.itemOptionsText.innerHTML = `Choose option ${this.state.currentOption}/${this.state[this.state.steps[this.state.currentStep-1]].length}`
+            this.itemSelectionTypeInfo.innerHTML = `Choose your ${this.state.steps[this.state.currentStep-1]}`
+            this.itemPositionView.innerHTML = `Choose option ${this.state.currentOption}/${this.state[this.state.steps[this.state.currentStep-1]].length}`
         }
     }
 } 
