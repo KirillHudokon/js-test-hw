@@ -17,7 +17,6 @@ export default class Customization extends Phaser.Scene {
         this.state = {...this.state,...newState}
     }
     getBody(id,type){
-        const emotions = ['angry', 'default', 'joy', 'sad', 'shy', 'surprised'];
         try{
             const name = `body_${type}`
             const path = require(`../assets/MAINHERO/start/body/${id}/face_f_${id}_body_f_regular_${type}_${id}.png`).default
@@ -28,6 +27,10 @@ export default class Customization extends Phaser.Scene {
         }catch(e){
             console.error(e.message)
         }
+        
+    }
+    getEmotions(id){
+        const emotions = ['angry', 'default', 'joy', 'sad', 'shy', 'surprised'];
         emotions.forEach(emotion => {
             try{
             const name = `face_f_${id}_${emotion}`
@@ -74,14 +77,16 @@ export default class Customization extends Phaser.Scene {
     }
     preload(){
         this.getBody(1,'white')
+        this.getEmotions(1)
         this.getBody(3,'latino')
+        this.getEmotions(3)
         this.getClothes()
         this.getHair()
         this.getAssets()
     }
     createHero(){
         const parent = this;
-        const localDate = JSON.parse(localStorage.getItem('hero_customization'))       
+        const localDate = JSON.parse(localStorage.getItem('mainhero_customization'))       
         this.setState({
             currentStep: localDate?.currentStep||1
         })
@@ -124,8 +129,8 @@ export default class Customization extends Phaser.Scene {
         this.scene.start('Dialog')
         const parent = this;
         //setTimeout(()=>{
-        //    parent.scene.start('Dialog')
-        //},2100)
+           // parent.scene.start('Dialog')
+       // },2100)
         const fadeDelay={
             body:1,
             face:0.1,
@@ -181,7 +186,7 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentOption:1
             })
-            let hero_customization = {
+            let mainhero_customization = {
                 currentStep: this.state.currentStep,
                 hero_structure:{
                     hair:this.state.hero_structure.hair.type,
@@ -190,7 +195,7 @@ export default class Customization extends Phaser.Scene {
                     cloths:this.state.hero_structure.cloths.type,
                 }
             }
-            localStorage.setItem('hero_customization',JSON.stringify(hero_customization))
+            localStorage.setItem('mainhero_customization',JSON.stringify(mainhero_customization))
             if(this.state.currentStep === 4) {
                 this.confirmButton.remove()
                 this.chooseContainer.remove()
@@ -248,7 +253,7 @@ export default class Customization extends Phaser.Scene {
                     cloths:this.state.hero_structure.cloths.type,
                 }
             }
-            localStorage.setItem('hero_customization',JSON.stringify(hero_customization))
+            localStorage.setItem('mainhero_customization',JSON.stringify(hero_customization))
             this.confirmButton.remove()
             this.chooseContainer.remove()
             this.itemChoosen()
