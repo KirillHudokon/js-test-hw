@@ -167,7 +167,6 @@ export default class Customization extends Phaser.Scene {
         
     }
     createItemSelectionInfoView(){
-        console.log(this.state,1)
         this.itemSelectionInfoView = document.createElement('div');
         this.itemPositionView = document.createElement('div');
         this.itemSelectionTypeInfo = document.createElement('div');
@@ -184,7 +183,6 @@ export default class Customization extends Phaser.Scene {
         this.confirmButton.className = 'confirmButton'
         this.confirmButton.innerHTML = 'Confirm'
         this.confirmButton.onclick=()=>{ 
-            console.log(this.state,'confirm')
             this.setState({
                 currentStep: parent.state.currentStep+1
             })

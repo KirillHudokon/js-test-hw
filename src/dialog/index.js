@@ -343,6 +343,23 @@ export default class Dialog extends Phaser.Scene {
             delay: 10
         })
     }
+    cameraMove(side){
+        let i = 0
+        this.time.addEvent({
+            callback: () => {
+                if(side === 'right' ){
+                    this.cameras.main.scrollX+=i  
+                    ++i
+                }
+                if(side === 'left' ){      
+                 this.cameras.main.scrollX+=i 
+                    --i
+                }
+            },
+            repeat: 5,
+            delay: 10
+        })
+    }
     save(){
         const parent = this
         this.setState({
@@ -406,6 +423,7 @@ export default class Dialog extends Phaser.Scene {
             this.setState({bg: ons2[this.state.i].backgroundName})
         }
         if(ons2[this.state.i].type === 'middle'){
+            this.cameras.main.offsetX=0
             if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
             if(this.frameBackground) this.frameBackground.destroy()
             if(this.frame){
@@ -450,8 +468,10 @@ export default class Dialog extends Phaser.Scene {
                 }else{
                     this.createEclipces()
                 }
+                this.cameraMove('left')
                 this.move(hero, 'right', )
                 this.timeMove = setTimeout(()=>{
+                    this.cameraMove('right')
                     this.move(hero,'left')
                 },2000)
             }
@@ -465,8 +485,10 @@ export default class Dialog extends Phaser.Scene {
                     this.createEclipces('reflect')
                 }
                 this.move(hero, 'left')
+                this.cameraMove('right')
                 this.timeMove = setTimeout(()=>{
                     this.move(hero,'right')
+                    this.cameraMove('left')
                 },2000)
             }
             
