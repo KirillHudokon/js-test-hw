@@ -86,14 +86,14 @@ export default class Customization extends Phaser.Scene {
     }
     createHero(){
         const parent = this;
-        const localDate = JSON.parse(localStorage.getItem('mainhero_customization'))       
+        const localDate = JSON.parse(localStorage.getItem('heroes'))       
         this.setState({
             currentStep: localDate?.currentStep||1
         })
         this.setState({
             hero_structure:{
                 body:{
-                    type:localDate?.hero_structure?.body||'body_white', 
+                    type:localDate?.mainhero_structure?.body||'body_white', 
                     link(){ 
                         this.img = parent.add.sprite(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(1)
                         if(parent.state.hero_structure.emotion && parent.state.hero_structure.emotion.img){
@@ -110,15 +110,15 @@ export default class Customization extends Phaser.Scene {
                     },  
                 }, 
                 cloths: { 
-                    type: localDate?.hero_structure?.cloths||'cloths_f_regular_8', 
+                    type: localDate?.mainhero_structure?.cloths||'cloths_f_regular_8', 
                     link(){ this.img = parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(2)}, 
                 },
                 emotion: {
-                    type:localDate?.hero_structure?.emotion||'face_f_1_default',
+                    type:localDate?.mainhero_structure?.emotion||'face_f_1_default',
                     link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(3)}, 
                 },
                 hair: { 
-                    type:localDate?.hero_structure?.hair||'hair_f_3', 
+                    type:localDate?.mainhero_structure?.hair||'hair_f_3', 
                     link(){ this.img =  parent.add.image(window.innerWidth/2, window.innerHeight-249,this.type).setScale(0.3).setDepth(4)},
                 },
             } 
@@ -126,11 +126,11 @@ export default class Customization extends Phaser.Scene {
         Object.values(this.state.hero_structure).forEach((img)=> img.link())
     }
     itemChoosen(){
-        this.scene.start('Dialog')
+       
         const parent = this;
-        //setTimeout(()=>{
-           // parent.scene.start('Dialog')
-       // },2100)
+        setTimeout(()=>{
+           this.scene.start('Dialog')
+        },2100)
         const fadeDelay={
             body:1,
             face:0.1,
@@ -186,16 +186,16 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentOption:1
             })
-            let mainhero_customization = {
+            let heroes = {
                 currentStep: this.state.currentStep,
-                hero_structure:{
+                mainhero_structure:{
                     hair:this.state.hero_structure.hair.type,
                     body:this.state.hero_structure.body.type,
                     emotion:this.state.hero_structure.emotion.type,
                     cloths:this.state.hero_structure.cloths.type,
                 }
             }
-            localStorage.setItem('mainhero_customization',JSON.stringify(mainhero_customization))
+            localStorage.setItem('heroes',JSON.stringify(heroes))
             if(this.state.currentStep === 4) {
                 this.confirmButton.remove()
                 this.chooseContainer.remove()
@@ -244,16 +244,16 @@ export default class Customization extends Phaser.Scene {
             this.setState({
                 currentStep: 4
             })
-            let hero_customization = {
+            let heroes = {
                 currentStep: this.state.currentStep,
-                hero_structure:{
+                mainhero_structure:{
                     hair:this.state.hero_structure.hair.type,
                     body:this.state.hero_structure.body.type,
                     emotion:this.state.hero_structure.emotion.type,
                     cloths:this.state.hero_structure.cloths.type,
                 }
             }
-            localStorage.setItem('mainhero_customization',JSON.stringify(hero_customization))
+            localStorage.setItem('heroes',JSON.stringify(heroes))
             this.confirmButton.remove()
             this.chooseContainer.remove()
             this.itemChoosen()
@@ -300,8 +300,7 @@ export default class Customization extends Phaser.Scene {
     create(){
         this.createHero();
         if(this.state.currentStep === 4){
-            console.log(1)
-            this.itemChoosen();
+            this.scene.start('Dialog')
         }
         if(this.state.currentStep !==4){
             this.createChooseContainer();

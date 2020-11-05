@@ -1,10 +1,12 @@
 import Phaser from "phaser"
-
+import ons2 from "../assets/ons2.json"
 export default class Dialog extends Phaser.Scene {
     constructor(){
         super('Dialog')
-        this.state={}
-       
+        this.state={
+            i:0,
+        }
+        
     }
     setState(newState){
         this.state = {...this.state,...newState}
@@ -24,7 +26,9 @@ export default class Dialog extends Phaser.Scene {
         this.load.image('bg', require('../assets/dialog/bg.png').default);
         this.load.image('home', require('../assets/dialog/home.png').default);
         this.load.image('bgphone_with_title', require('../assets/dialog/bgphone_with_title.png').default);
-        this.load.image('background', require('../assets/Backgrounds/ons-lux-party-balcony-7.jpg').default)
+        this.load.image('ons-lux-party-balcony-7', require('../assets/Backgrounds/ons-lux-party-balcony-7.jpg').default)
+        this.load.image('background_ons-lux-party-hall-6', require('../assets/Backgrounds/ons-lux-party-hall-6.jpg').default)
+        this.load.image('ons-ms-apartment-bedroom-5', require('../assets/Backgrounds/ons-ms-apartment-bedroom-5.jpg').default)
         this.load.image('white_background', require('../assets/dialog/white_background.png').default )
         this.load.image('ellipse', require('../assets/dialog/Ellipse.png').default )
         this.load.image('phone', require('../assets/dialog/phone_bubble.png').default )
@@ -45,6 +49,9 @@ export default class Dialog extends Phaser.Scene {
         this.load.image('cloths_m_regular_6', require('../assets/Russell/cloths_m_regular_6.png').default )
         this.load.image('body_russell', require('../assets/Russell/face_m_1_body_m_regular_white_1.png').default )
     }
+    getJSON(){
+        this.load.text('dialog', '../assets/ons2.json');
+    }
 
     preload(){
         this.getEmotionAssets()
@@ -52,8 +59,8 @@ export default class Dialog extends Phaser.Scene {
         this.getRussellAssets()
     }
     preloadHeros(){
-        const mainhero = JSON.parse(localStorage.getItem('mainhero_customization'))?.hero_structure  
-        const russell = JSON.parse(localStorage.getItem('russell_customization'))?.hero_structure  
+        const mainhero = JSON.parse(localStorage.getItem('heroes'))?.mainhero_structure  
+        const russell = JSON.parse(localStorage.getItem('heroes'))?.russell_structure  
         this.setState({
             mainhero
         })
@@ -72,30 +79,46 @@ export default class Dialog extends Phaser.Scene {
     createHero(who,type){
         const parent = this
         const hero_structure = this.state[who]
-        console.log(hero_structure,11)
+        
         const bgEmotionName = hero_structure.emotion.split('_')
-        const x = type === 'reverse' ? window.innerWidth/2+80 : window.innerWidth/2-80;
+        const x = type === 'reflect' ? window.innerWidth/2+280 : window.innerWidth/2-280;
         const y =window.innerHeight/2+10;
-        this.bg_emotion = type === 'reverse' ? 
-            this.make.image({
-                x,
-                y,
-                key: bgEmotionName[bgEmotionName.length-1],
-                add: true
-            }).setScale(0.3).setDepth(1).setFlip(true,false) : 
-            this.make.image({
-                x,
-                y,
-                key: bgEmotionName[bgEmotionName.length-1],
-                add: true
-            }).setScale(0.3).setDepth(1)
-
+        let sup = Symbol("sup");
+        this.setState({
+            [`${who}_key`]:sup
+        })
         this.setState({
             [who]:{
+                ...this.state[who],
+                [sup]:{
+                    bg_emotion:{
+                        link(){
+                            this.img = type === 'reflect' ? 
+                            parent.make.image({
+                                x,
+                                y,
+                                key: bgEmotionName[bgEmotionName.length-1],
+                                add: true
+                            }).setScale(0.3).setDepth(1).setFlip(true,false) : 
+                            parent.make.image({
+                                x,
+                                y,
+                                key: bgEmotionName[bgEmotionName.length-1],
+                                add: true
+                            }).setScale(0.3).setDepth(1)
+                        }
+                    }
+                }
+            }
+        })
+    
+        this.setState({
+            [who]:{
+                ...this.state[who],
                 body:{
                     type:hero_structure.body,
                     link(){ 
-                        this.img = type === 'reverse' ?
+                        this.img = type === 'reflect' ?
                             parent.make.image({
                                 x,
                                 y,
@@ -113,7 +136,7 @@ export default class Dialog extends Phaser.Scene {
                 cloths: { 
                     type:hero_structure.cloths,
                     link(){ 
-                        this.img = type === 'reverse' ?
+                        this.img = type === 'reflect' ?
                         parent.make.image({
                             x,
                             y,
@@ -131,7 +154,7 @@ export default class Dialog extends Phaser.Scene {
                 emotion: {
                     type:hero_structure.emotion,
                     link(){ 
-                        this.img = type === 'reverse' ?
+                        this.img = type === 'reflect' ?
                         parent.make.image({
                             x,
                             y,
@@ -149,7 +172,7 @@ export default class Dialog extends Phaser.Scene {
                 hair: { 
                     type:hero_structure.hair,
                     link(){ 
-                        this.img = type === 'reverse' ?
+                        this.img = type === 'reflect' ?
                         parent.make.image({
                             x,
                             y,
@@ -167,25 +190,39 @@ export default class Dialog extends Phaser.Scene {
             } 
         }); 
         
-
-        
-        const checker = type === 'reverse' ? 
-            this.make.sprite({
-                x:x-16,
-                y:y-50,
-                key: 'vision',
-                add: false
-            }).setScale(0.40) : 
-            this.make.sprite({
-                x:x+23,
-                y:y-50,
-                key: 'vision',
-                add: false
-            }).setScale(0.40);
-        checker.angle = 45
-        Object.values(this.state[who]).forEach((item)=> item.link())
+        this.setState({
+            [who]:{
+                ...this.state[who],
+                [sup]:{
+                    ...parent.state[who][sup],
+                    checker:{
+                        link(){
+                            this.img = type === 'reflect' ? 
+                            parent.make.sprite({
+                                x:x-16,
+                                y:y-50,
+                                key: 'vision',
+                                add: false
+                            }).setScale(0.40) : 
+                            parent.make.sprite({
+                                x:x+23,
+                                y:y-50,
+                                key: 'vision',
+                                add: false
+                            }).setScale(0.40);
+                        }
+                    }
+                }
+            }
+        })
+  
+        this.state[who][sup].bg_emotion.link()
+        this.state[who][sup].checker.link()
+        this.state[who][sup].checker.img.angle = 45
+       
+        Object.values(this.state[who]).forEach(item=> item.link())
         Object.values(this.state[who]).forEach((item)=>{
-            item.img.mask = new Phaser.Display.Masks.BitmapMask(this, checker);
+            item.img.mask = new Phaser.Display.Masks.BitmapMask(this, this.state[who][sup].checker.img);
         })
     }
     createFrame(){
@@ -260,31 +297,78 @@ export default class Dialog extends Phaser.Scene {
             delay: 5
         })
     }
-
+    go(){
+   
+        let i = 0
+        this.time.addEvent({
+            callback: () => {
+                Object.values(this.state.mainhero).forEach(item=> item.img.x+=i )
+                this.state.mainhero[this.state.mainhero_key].bg_emotion.img.x+=i
+                this.state.mainhero[this.state.mainhero_key].checker.img.x+=i
+                ++i
+            },
+            repeat: 20,
+            delay: 10
+        })
+    }
+    save(){
+        const parent = this
+        this.setState({
+            i:this.state.i+1
+        })
+        let heroes = {
+            currentStep: JSON.parse(localStorage.getItem('heroes')).currentStep,
+            dialog:parent.state.i,
+            mainhero_structure:{
+                hair:parent.state.mainhero.hair.type,
+                body:parent.state.mainhero.body.type,
+                emotion:parent.state.mainhero.emotion.type,
+                cloths:parent.state.mainhero.cloths.type,
+            },
+            russell_structure:{
+                hair:parent.state.russell.hair.type,
+                body:parent.state.russell.body.type,
+                emotion:parent.state.russell.emotion.type,
+                cloths:parent.state.russell.cloths.type,
+            }
+        }
+        console.log(heroes)
+       localStorage.setItem('heroes',JSON.stringify(heroes))
+    }
+    runDialog(){
+        while(this.state.i<=ons2.length){
+           this.setState({
+               i:this.state.i+1
+           })
+           this.save()
+        }
+    }
     create(){
-        this.preloadHeros()
     
-     
-        this.createHero('mainhero')
-     
+        const parent= this
+        this.preloadHeros()
+
+        this.createHero('mainhero')  
+        this.createHero('russell','reflect')
         this.add.image(window.innerWidth/2, window.innerHeight/2, 'background')
         this.createFrameWithTitle()
         this.addTitle('asdfsad', )
         //this.createFrameWithTitle()
         this.createEclipces('phone')
         this.createText('lanayafsafjs sadkf jasd fasdk faskjd k')
-        //this.time.addEvent({
-           // callback: () => {
-              //  b.x+=1
-           // },
-           // repeat: 100,
-           // delay: 5
-        //})
+        setTimeout(()=>{
+            //parent.state.mainhero[parent.state.mainhero_key].bg_emotion.img.destroy()
+            //this.go()
+        },4000)
         //b.animations.add('run')
         //b.animations.play('run', 15, true);
         //console.log(b.animations)
         //b.play('jump')
-      
+        //this.go()
+        //this.go()
+        this.runDialog()
+    } 
+    update(){
         
-    }   
+    }  
 } 
