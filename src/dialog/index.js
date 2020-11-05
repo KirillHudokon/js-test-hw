@@ -4,7 +4,7 @@ export default class Dialog extends Phaser.Scene {
     constructor(){
         super('Dialog')
         this.state={
-            i:0,
+            i:0 ,
             bg:undefined
         }
         
@@ -299,24 +299,25 @@ export default class Dialog extends Phaser.Scene {
         })
         
     }
-    move(who,side,isReflect){
+    move(who,side){
         let i = 0
         this.time.addEvent({
             callback: () => {
-                if(side === 'right' && !isReflect){
+                if(side === 'right' ){
              
                     Object.values(this.state[who]).forEach(item=> item.img.x+=i)
                     this.state[who][this.state[`${who}_key`]].bg_emotion.img.x+=i
                     this.state[who][this.state[`${who}_key`]].checker.img.x+=i
                     ++i
                 }
-                if(side === 'left' && !isReflect){
+                if(side === 'left' ){
                
                     Object.values(this.state[who]).forEach(item=> item.img.x+=i)
                     this.state[who][this.state[`${who}_key`]].bg_emotion.img.x+=i
                     this.state[who][this.state[`${who}_key`]].checker.img.x+=i
                     --i
                 }
+
             },
             repeat: 20,
             delay: 10
@@ -345,7 +346,7 @@ export default class Dialog extends Phaser.Scene {
             }
         }
        localStorage.setItem('heroes',JSON.stringify(heroes))
-       if(this.state.i<10){
+       if(this.state.i<ons2.length){
            setTimeout(()=>{
                 parent.runDialog()
            },4000)
@@ -365,67 +366,70 @@ export default class Dialog extends Phaser.Scene {
         if(ons2[this.state.i].type === 'middle'){
             if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
             if(this.frameBackground) this.frameBackground.destroy()
+            if(this.frame) this.frame.destroy()
             if(this.frameWithTitle) this.frameWithTitle.destroy()
             if(this.title) this.title.destroy()
             if(this.label) this.label.destroy()
             this.createFrame()
             this.createText(ons2[this.state.i].text)
         }
-        if(ons2[this.state.i].character === 'MAINHERO'){
+        if(ons2[this.state.i].character){
+            const hero = ons2[this.state.i].character.toLowerCase()
             if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
             if(this.frameBackground) this.frameBackground.destroy()
             if(this.frameWithTitle) this.frameWithTitle.destroy()
             if(this.frame) this.frame.destroy()
             if(this.title) this.title.destroy()
             if(this.label) this.label.destroy()
-            console.log(this.state)
-            Object.values(this.state.mainhero).forEach(item=> item.img.destroy())
-            this.state.mainhero[this.state.mainhero_key].checker.img.destroy()
-            this.state.mainhero[this.state.mainhero_key].bg_emotion.img.destroy()
+            Object.values(this.state[hero]).forEach(item=> item.img.destroy())
+            this.state[hero][this.state[`${hero}_key`]].checker.img.destroy()
+            this.state[hero][this.state[`${hero}_key`]].bg_emotion.img.destroy()
             this.setState({
-                mainhero:{
-                    hair:parent.state.mainhero.hair.type,
-                    body:parent.state.mainhero.body.type,
-                    emotion: 'face_f_1_'+ons2[parent.state.i].emotion,
-                    cloths:parent.state.mainhero.cloths.type,
+                [hero]:{
+                    hair:parent.state[hero].hair.type,
+                    body:parent.state[hero].body.type,
+                    emotion: hero === 'mainhero' ? 'face_f_1_'+ons2[parent.state.i].emotion : 'face_m_1_'+ons2[parent.state.i].emotion ,
+                    cloths:parent.state[hero].cloths.type,
                 }
             })
-            this.createHero('mainhero')
-            this.createFrameWithTitle()
-            this.addTitle('Hero')
-            this.createText(ons2[this.state.i].text)
+
             if(ons2[this.state.i].type === 'left'){
-                if(ons2[this.state.i].boxType === 'thought'){
+                this.createHero(hero)
+                this.createFrameWithTitle()
+                this.addTitle(hero)
+                if(ons2[this.state.i].boxType === 'phone'){
+                    this.createEclipces('phone')
+                }else{
                     this.createEclipces()
                 }
-                this.move('mainhero', 'right')
+                this.move(hero, 'right', )
                 setTimeout(()=>{
-                    this.move('mainhero','left')
+                    this.move(hero,'left')
                 },2000)
             }
+            if(ons2[this.state.i].type === 'right'){
+                this.createHero(hero,'reflect')
+                this.createFrameWithTitle('reflect')
+                this.addTitle(hero, 'reflect')
+                if(ons2[this.state.i].boxType === 'phone'){
+                    this.createEclipces('phone reflect')
+                }else{
+                    this.createEclipces('reflect')
+                }
+                this.move(hero, 'left')
+                setTimeout(()=>{
+                    this.move(hero,'right')
+                },2000)
+            }
+            
+            this.createText(ons2[this.state.i].text)
         }
         this.save()
     }
     create(){
-        const parent= this
         this.preloadHeros()
         this.createHero('mainhero')  
         this.createHero('russell','reflect')
-        //this.createFrameWithTitle()
-        //this.addTitle('asdfsad', )
-        //this.createFrameWithTitle()
-        //this.createEclipces('phone')
-       // this.createText('lanayafsafjs sadkf jasd fasdk faskjd k')
-        //setTimeout(()=>{
-            //parent.state.mainhero[parent.state.mainhero_key].bg_emotion.img.destroy()
-            //this.go()
-        //},4000)
-        //b.animations.add('run')
-        //b.animations.play('run', 15, true);
-        //console.log(b.animations)
-        //b.play('jump')
-        //this.go()
-        //this.go()
         this.runDialog()
     } 
     update(){
