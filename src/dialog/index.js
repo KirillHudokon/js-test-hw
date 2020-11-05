@@ -5,6 +5,7 @@ export default class Dialog extends Phaser.Scene {
         super('Dialog')
         this.state={
             i:0,
+            bg:undefined
         }
         
     }
@@ -227,7 +228,7 @@ export default class Dialog extends Phaser.Scene {
     }
     createFrame(){
         this.frameBackground= this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'white_background').setDepth(9)
-        this.frameWithTitle = this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'bg').setDepth(10)
+        this.frame= this.add.sprite(window.innerWidth/2, window.innerHeight/2+142, 'bg').setDepth(10)
     }
     createFrameWithTitle(type){
         this.frameBackground= this.add.sprite(window.innerWidth/2, window.innerHeight/2+148, 'white_background').setDepth(9)
@@ -237,11 +238,11 @@ export default class Dialog extends Phaser.Scene {
 
      }
     createText(text){
-        this.label = this.add.text(window.innerWidth/2-148, window.innerHeight/2+110, '', {
+        this.label = this.add.text(window.innerWidth/2-148, window.innerHeight/2+105, '', {
             align:'center', 
             color:'#141A3D', 
             fontFamily: 'Nunito Sans Bold',
-            fontSize:'18px'
+            fontSize:'17px'
         }).setWordWrapWidth(300,false).setDepth(11)
         
         this.typewriteText(text)
@@ -285,10 +286,10 @@ export default class Dialog extends Phaser.Scene {
             this.add.text(window.innerWidth/2+35, window.innerHeight/2+78, text, titleConfig).setDepth(11)
      
     }
-    typewriteText(text){   
+     typewriteText(text){   
         const length = text.length
         let i = 0
-        this.time.addEvent({
+         this.time.addEvent({
             callback: () => {
                 this.label.text += text[i]
                 ++i
@@ -296,16 +297,26 @@ export default class Dialog extends Phaser.Scene {
             repeat: length - 1,
             delay: 5
         })
+        
     }
-    go(){
-   
+    move(who,side,isReflect){
         let i = 0
         this.time.addEvent({
             callback: () => {
-                Object.values(this.state.mainhero).forEach(item=> item.img.x+=i )
-                this.state.mainhero[this.state.mainhero_key].bg_emotion.img.x+=i
-                this.state.mainhero[this.state.mainhero_key].checker.img.x+=i
-                ++i
+                if(side === 'right' && !isReflect){
+             
+                    Object.values(this.state[who]).forEach(item=> item.img.x+=i)
+                    this.state[who][this.state[`${who}_key`]].bg_emotion.img.x+=i
+                    this.state[who][this.state[`${who}_key`]].checker.img.x+=i
+                    ++i
+                }
+                if(side === 'left' && !isReflect){
+               
+                    Object.values(this.state[who]).forEach(item=> item.img.x+=i)
+                    this.state[who][this.state[`${who}_key`]].bg_emotion.img.x+=i
+                    this.state[who][this.state[`${who}_key`]].checker.img.x+=i
+                    --i
+                }
             },
             repeat: 20,
             delay: 10
@@ -318,6 +329,7 @@ export default class Dialog extends Phaser.Scene {
         })
         let heroes = {
             currentStep: JSON.parse(localStorage.getItem('heroes')).currentStep,
+            bg:this.state.bg,
             dialog:parent.state.i,
             mainhero_structure:{
                 hair:parent.state.mainhero.hair.type,
@@ -332,43 +344,82 @@ export default class Dialog extends Phaser.Scene {
                 cloths:parent.state.russell.cloths.type,
             }
         }
-        console.log(heroes)
        localStorage.setItem('heroes',JSON.stringify(heroes))
+       if(this.state.i<10){
+           setTimeout(()=>{
+                parent.runDialog()
+           },4000)
+       }
     }
     addBackground(bg){
-        console.log(bg)
         this.background = this.add.image(window.innerWidth/2, window.innerHeight/2, bg)
     }
-    runDialog(){
-        while(this.state.i<=ons2.length){
-            if(this.state.i === 2) break;
-            if(ons2[this.state.i].backgroundName){
-                if(this.background) this.background.destroy()
-                this.addBackground(ons2[this.state.i].backgroundName)
-            }
-           this.setState({
-               i:this.state.i+1
-           })
-           this.save()
+    runDialog(){  
+        const parent = this
+        console.log(this.state.i)
+        if(ons2[this.state.i].backgroundName){
+            if(this.background) this.background.destroy()
+            this.addBackground(ons2[this.state.i].backgroundName)
+            this.setState({bg: ons2[this.state.i].backgroundName})
         }
+        if(ons2[this.state.i].type === 'middle'){
+            if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
+            if(this.frameBackground) this.frameBackground.destroy()
+            if(this.frameWithTitle) this.frameWithTitle.destroy()
+            if(this.title) this.title.destroy()
+            if(this.label) this.label.destroy()
+            this.createFrame()
+            this.createText(ons2[this.state.i].text)
+        }
+        if(ons2[this.state.i].character === 'MAINHERO'){
+            if(this.ellipses) this.ellipses.forEach(item=>item.destroy())
+            if(this.frameBackground) this.frameBackground.destroy()
+            if(this.frameWithTitle) this.frameWithTitle.destroy()
+            if(this.frame) this.frame.destroy()
+            if(this.title) this.title.destroy()
+            if(this.label) this.label.destroy()
+            console.log(this.state)
+            Object.values(this.state.mainhero).forEach(item=> item.img.destroy())
+            this.state.mainhero[this.state.mainhero_key].checker.img.destroy()
+            this.state.mainhero[this.state.mainhero_key].bg_emotion.img.destroy()
+            this.setState({
+                mainhero:{
+                    hair:parent.state.mainhero.hair.type,
+                    body:parent.state.mainhero.body.type,
+                    emotion: 'face_f_1_'+ons2[parent.state.i].emotion,
+                    cloths:parent.state.mainhero.cloths.type,
+                }
+            })
+            this.createHero('mainhero')
+            this.createFrameWithTitle()
+            this.addTitle('Hero')
+            this.createText(ons2[this.state.i].text)
+            if(ons2[this.state.i].type === 'left'){
+                if(ons2[this.state.i].boxType === 'thought'){
+                    this.createEclipces()
+                }
+                this.move('mainhero', 'right')
+                setTimeout(()=>{
+                    this.move('mainhero','left')
+                },2000)
+            }
+        }
+        this.save()
     }
     create(){
-    
         const parent= this
         this.preloadHeros()
-
         this.createHero('mainhero')  
         this.createHero('russell','reflect')
-        this.add.image(window.innerWidth/2, window.innerHeight/2, 'background')
-        this.createFrameWithTitle()
-        this.addTitle('asdfsad', )
         //this.createFrameWithTitle()
-        this.createEclipces('phone')
-        this.createText('lanayafsafjs sadkf jasd fasdk faskjd k')
-        setTimeout(()=>{
+        //this.addTitle('asdfsad', )
+        //this.createFrameWithTitle()
+        //this.createEclipces('phone')
+       // this.createText('lanayafsafjs sadkf jasd fasdk faskjd k')
+        //setTimeout(()=>{
             //parent.state.mainhero[parent.state.mainhero_key].bg_emotion.img.destroy()
             //this.go()
-        },4000)
+        //},4000)
         //b.animations.add('run')
         //b.animations.play('run', 15, true);
         //console.log(b.animations)
