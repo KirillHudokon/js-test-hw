@@ -26,9 +26,9 @@ export default class Dialog extends Phaser.Scene {
         this.load.image('bg', require('../assets/dialog/bg.png').default);
         this.load.image('home', require('../assets/dialog/home.png').default);
         this.load.image('bgphone_with_title', require('../assets/dialog/bgphone_with_title.png').default);
-        this.load.image('ons-lux-party-balcony-7', require('../assets/Backgrounds/ons-lux-party-balcony-7.jpg').default)
+        this.load.image('background_ons-lux-party-balcony-7', require('../assets/Backgrounds/ons-lux-party-balcony-7.jpg').default)
         this.load.image('background_ons-lux-party-hall-6', require('../assets/Backgrounds/ons-lux-party-hall-6.jpg').default)
-        this.load.image('ons-ms-apartment-bedroom-5', require('../assets/Backgrounds/ons-ms-apartment-bedroom-5.jpg').default)
+        this.load.image('background_ons-ms-apartment-bedroom-5', require('../assets/Backgrounds/ons-ms-apartment-bedroom-5.jpg').default)
         this.load.image('white_background', require('../assets/dialog/white_background.png').default )
         this.load.image('ellipse', require('../assets/dialog/Ellipse.png').default )
         this.load.image('phone', require('../assets/dialog/phone_bubble.png').default )
@@ -335,8 +335,17 @@ export default class Dialog extends Phaser.Scene {
         console.log(heroes)
        localStorage.setItem('heroes',JSON.stringify(heroes))
     }
+    addBackground(bg){
+        console.log(bg)
+        this.background = this.add.image(window.innerWidth/2, window.innerHeight/2, bg)
+    }
     runDialog(){
         while(this.state.i<=ons2.length){
+            if(this.state.i === 2) break;
+            if(ons2[this.state.i].backgroundName){
+                if(this.background) this.background.destroy()
+                this.addBackground(ons2[this.state.i].backgroundName)
+            }
            this.setState({
                i:this.state.i+1
            })
